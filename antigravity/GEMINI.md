@@ -7,12 +7,16 @@
 
 ## 2. Planning & Execution Workflow
 - ALWAYS use `/using-superpowers` for non-trivial tasks (Do NOT use default `/planning` mode).
-- **The 3-Step Workflow (Brainstorm -> Approve -> Auto-Execute):**
+- **The 5-Step Workflow (Brainstorm -> Approve Spec -> Write Plan -> Approve Plan -> Auto-Execute):**
   1. **Brainstorm/Spec**: Use the `brainstorming` skill to analyze requirements and design a solution.
-  2. **Mandatory Pause (Approval) - HARD GATE**: After presenting the brainstorm/spec, you MUST output the phrase:
-     *"⏸️ **Chờ duyệt** — Gõ OK hoặc Duyệt để tiếp tục."*
+  2. **Mandatory Pause 1 (Approve Spec) - HARD GATE**: After presenting the brainstorm/spec, you MUST output the phrase:
+     *"⏸️ **Chờ duyệt Spec** — Gõ OK hoặc Duyệt để tiếp tục."*
      Then IMMEDIATELY STOP ALL TOOL CALLS. Do not call any tool (including `writing-plans`) until the user explicitly responds with approval.
-  3. **Auto Execution**: Upon receiving "OK/Duyệt", AUTOMATICALLY run the `writing-plans` skill (to generate checklists) and transition directly into `subagent-driven-development` for implementation. DO NOT PAUSE between plan creation and execution. DO NOT ask the user to choose an execution mode.
+  3. **Write Plan**: Upon receiving approval for the Spec, AUTOMATICALLY run the `writing-plans` skill to generate a detailed implementation plan.
+  4. **Mandatory Pause 2 (Approve Plan) - HARD GATE**: After writing the implementation plan, you MUST output the phrase:
+     *"⏸️ **Chờ duyệt Plan** — Gõ OK hoặc Duyệt để tiếp tục."*
+     Then IMMEDIATELY STOP ALL TOOL CALLS. Do not call any tool or transition to execution until the user explicitly responds with approval.
+  5. **Auto Execution**: Upon receiving approval for the Plan, AUTOMATICALLY transition directly into `subagent-driven-development` for implementation. DO NOT ask the user to choose an execution mode.
 - *Note*: If tests are not requested, plans must explicitly state: *"Không viết test mới; chỉ dùng kiểm chứng không tạo test hoặc chạy test sẵn có nếu phù hợp."*
 
 ## 3. Strict Test-Writing Policy
