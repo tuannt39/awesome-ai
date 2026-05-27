@@ -1,182 +1,165 @@
 ---
 name: dispatching-parallel-agents
-description: Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies
+description: Use when facing 2 or more independent tasks with no shared state or sequential dependencies
 ---
 
 # Dispatching Parallel Agents
 
 ## Overview
 
-You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+You delegate tasks to specialized subagents with independent contexts. By setting precise instructions and context for them, you ensure they remain focused and complete their tasks successfully. They never inherit your current session history or context — you only build exactly what they need. This also helps preserve your own context for dispatch coordination.
 
-When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
+When you encounter multiple unrelated test failures or system errors in different subsystems, investigating and fixing them sequentially is a waste of time. Each investigation is independent and can fully run in parallel.
 
-**Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
+**Core Principle:** Dispatch one subagent for each independent problem domain. Let them run concurrently.
 
 ## When to Use
 
 ```dot
 digraph when_to_use {
-    "Multiple failures?" [shape=diamond];
+    "Multiple errors occurred?" [shape=diamond];
     "Are they independent?" [shape=diamond];
-    "Single agent investigates all" [shape=box];
-    "One agent per problem domain" [shape=box];
-    "Can they work in parallel?" [shape=diamond];
-    "Sequential agents" [shape=box];
+    "One subagent investigates all" [shape=box];
+    "One subagent per problem domain" [shape=box];
+    "Can they run in parallel?" [shape=diamond];
+    "Sequential dispatch" [shape=box];
     "Parallel dispatch" [shape=box];
 
-    "Multiple failures?" -> "Are they independent?" [label="yes"];
-    "Are they independent?" -> "Single agent investigates all" [label="no - related"];
-    "Are they independent?" -> "Can they work in parallel?" [label="yes"];
-    "Can they work in parallel?" -> "Parallel dispatch" [label="yes"];
-    "Can they work in parallel?" -> "Sequential agents" [label="no - shared state"];
+    "Multiple errors occurred?" -> "Are they independent?" [label="yes"];
+    "Are they independent?" -> "One subagent investigates all" [label="no - related"];
+    "Are they independent?" -> "Can they run in parallel?" [label="yes"];
+    "Can they run in parallel?" -> "Parallel dispatch" [label="yes"];
+    "Can they run in parallel?" -> "Sequential dispatch" [label="no - shared state"];
 }
 ```
 
 **Use when:**
-- 3+ test files failing with different root causes
-- Multiple subsystems broken independently
-- Each problem can be understood without context from others
-- No shared state between investigations
+- 3 or more test files are failing with completely different root causes.
+- Multiple subsystems are broken independently.
+- Each issue can be understood and resolved without context from other issues.
+- There is no shared state between investigations or code modifications.
 
-**Don't use when:**
-- Failures are related (fix one might fix others)
-- Need to understand full system state
-- Agents would interfere with each other
+**Do not use when:**
+- The errors are closely related (fixing one might automatically fix another).
+- Understanding the full system state is required to resolve them.
+- Subagents will interfere with or overwrite each other's work (editing the same file or lines of code).
 
-## The Pattern
+## Execution Model
 
 ### 1. Identify Independent Domains
 
-Group failures by what's broken:
-- File A tests: Tool approval flow
-- File B tests: Batch completion behavior
-- File C tests: Abort functionality
+Group test/system failures by what is broken:
+- Group A: Tool approval flow test failures.
+- Group B: Batch completion behavior test failures.
+- Group C: Abort functionality test failures.
 
-Each domain is independent - fixing tool approval doesn't affect abort tests.
+Each of these domains is independent — fixing tool approval does not affect abort tests.
 
-### 2. Create Focused Agent Tasks
+### 2. Set Up Focused Subagent Tasks
 
-Each agent gets:
-- **Specific scope:** One test file or subsystem
-- **Clear goal:** Make these tests pass
-- **Constraints:** Don't change other code
-- **Expected output:** Summary of what you found and fixed
+Each subagent will receive:
+- **Specific scope:** A specific test file or subsystem.
+- **Clear goal:** Make these tests pass.
+- **Constraints:** Do not change other code outside the scope.
+- **Expected output:** A detailed summary of what was found and fixed.
 
-### 3. Dispatch in Parallel
+### 3. Parallel Dispatch on Antigravity CLI
+
+On Antigravity CLI, the standard method to run subagents in parallel is using the `Subagents` property in a single `invoke_subagent` call.
+
+Sample TypeScript code:
 
 ```typescript
-// In Claude Code / AI environment
-Task("Fix agent-tool-abort.test.ts failures")
-Task("Fix batch-completion-behavior.test.ts failures")
-Task("Fix tool-approval-race-conditions.test.ts failures")
-// All three run concurrently
+// Inside Antigravity CLI / AI environment
+invoke_subagent({
+  Subagents: [
+    {
+      TypeName: "self",
+      Role: "Fix agent-tool-abort.test.ts",
+      Prompt: "Fix the test errors in src/agents/agent-tool-abort.test.ts...",
+      Workspace: "branch" // Use isolated workspace instead of manual git worktree
+    },
+    {
+      TypeName: "self",
+      Role: "Fix batch-completion-behavior.test.ts",
+      Prompt: "Fix the test errors in src/agents/batch-completion-behavior.test.ts...",
+      Workspace: "branch"
+    },
+    {
+      TypeName: "self",
+      Role: "Fix tool-approval-race-conditions.test.ts",
+      Prompt: "Fix the test errors in src/agents/tool-approval-race-conditions.test.ts...",
+      Workspace: "branch"
+    }
+  ]
+});
+// All 3 subagents will run in parallel, completely independent and safe
 ```
+
+> [!TIP]
+> Use the `Workspace: "branch"` property when calling subagents to leverage the automatic workspace isolation feature of Antigravity CLI. This is much safer and cleaner than running manual `git worktree` commands.
 
 ### 4. Review and Integrate
 
-When agents return:
-- Read each summary
-- Verify fixes don't conflict
-- Run full test suite
-- Integrate all changes
+When the subagents complete and respond:
+- Carefully read each subagent's summary.
+- Verify that fixes do not conflict with each other.
+- Run the full test suite to ensure consistency.
+- Integrate all changes into the main development branch.
 
-## Agent Prompt Structure
+## Sample Subagent Prompt Structure
 
-Good agent prompts are:
-1. **Focused** - One clear problem domain
-2. **Self-contained** - All context needed to understand the problem
-3. **Specific about output** - What should the agent return?
+A good prompt for parallel subagents must ensure:
+1. **Focus** - Only one clear problem domain.
+2. **Self-contained** - Provide enough context to understand the issue without external reading.
+3. **Specific output** - Clearly ask what information the subagent should return.
 
 ```markdown
-Fix the 3 failing tests in src/agents/agent-tool-abort.test.ts:
+Fix 3 failing tests in src/agents/agent-tool-abort.test.ts:
 
-1. "should abort tool with partial output capture" - expects 'interrupted at' in message
-2. "should handle mixed completed and aborted tools" - fast tool aborted instead of completed
-3. "should properly track pendingToolCount" - expects 3 results but gets 0
+1. "should abort tool with partial output capture" - expects 'interrupted at' in the error message.
+2. "should handle mixed completed and aborted tools" - fast-running tool gets aborted instead of completed.
+3. "should properly track pendingToolCount" - expects 3 results but received 0.
 
-These are timing/race condition issues. Your task:
+These issues are related to timing/race conditions. Your tasks:
 
-1. Read the test file and understand what each test verifies
-2. Identify root cause - timing issues or actual bugs?
+1. Read the test file and understand what each test verifies.
+2. Identify the root cause - is it due to timing or an actual bug?
 3. Fix by:
-   - Replacing arbitrary timeouts with event-based waiting
-   - Fixing bugs in abort implementation if found
-   - Adjusting test expectations if testing changed behavior
+   - Replacing arbitrary timeouts with event-based waiting mechanisms.
+   - Fixing the abort implementation if bugs are found.
+   - Adjusting test expectations if the behavioral change is acceptable.
 
-Do NOT just increase timeouts - find the real issue.
+DO NOT blindly increase timeouts — find and fix the real issue.
+TESTING WARNING: Do not write new tests, focus only on fixing the existing failing tests.
 
-Return: Summary of what you found and what you fixed.
+Returned output: Summarize the root cause and what you fixed in Vietnamese.
 ```
 
 ## Common Mistakes
 
-**❌ Too broad:** "Fix all the tests" - agent gets lost
-**✅ Specific:** "Fix agent-tool-abort.test.ts" - focused scope
+**❌ Too broad:** "Fix all test errors in the project" - the subagent will get lost.
+**✅ Specific:** "Fix agent-tool-abort.test.ts errors" - clear, focused scope.
 
-**❌ No context:** "Fix the race condition" - agent doesn't know where
-**✅ Context:** Paste the error messages and test names
+**❌ No context:** "Fix the race condition" - the subagent doesn't know where it occurs.
+**✅ Context:** Provide detailed error messages and names of the failing tests.
 
-**❌ No constraints:** Agent might refactor everything
-**✅ Constraints:** "Do NOT change production code" or "Fix tests only"
+**❌ No constraints:** The subagent might arbitrarily refactor the entire project.
+**✅ Constraints:** "Only modify the test file" or "Do not change production code structure".
 
-**❌ Vague output:** "Fix it" - you don't know what changed
-**✅ Specific:** "Return summary of root cause and changes"
+**❌ Vague output:** "Fixed it" - you don't know what was changed.
+**✅ Specific request:** "Return a summary of root causes and changes made."
 
-## When NOT to Use
+## Core Benefits
 
-**Related failures:** Fixing one might fix others - investigate together first
-**Need full context:** Understanding requires seeing entire system
-**Exploratory debugging:** You don't know what's broken yet
-**Shared state:** Agents would interfere (editing same files, using same resources)
-
-## Real Example from Session
-
-**Scenario:** 6 test failures across 3 files after major refactoring
-
-**Failures:**
-- agent-tool-abort.test.ts: 3 failures (timing issues)
-- batch-completion-behavior.test.ts: 2 failures (tools not executing)
-- tool-approval-race-conditions.test.ts: 1 failure (execution count = 0)
-
-**Decision:** Independent domains - abort logic separate from batch completion separate from race conditions
-
-**Dispatch:**
-```
-Agent 1 → Fix agent-tool-abort.test.ts
-Agent 2 → Fix batch-completion-behavior.test.ts
-Agent 3 → Fix tool-approval-race-conditions.test.ts
-```
-
-**Results:**
-- Agent 1: Replaced timeouts with event-based waiting
-- Agent 2: Fixed event structure bug (threadId in wrong place)
-- Agent 3: Added wait for async tool execution to complete
-
-**Integration:** All fixes independent, no conflicts, full suite green
-
-**Time saved:** 3 problems solved in parallel vs sequentially
-
-## Key Benefits
-
-1. **Parallelization** - Multiple investigations happen simultaneously
-2. **Focus** - Each agent has narrow scope, less context to track
-3. **Independence** - Agents don't interfere with each other
-4. **Speed** - 3 problems solved in time of 1
+1. **Parallelization** - Multiple investigations and fixes happen concurrently.
+2. **Focus** - Each subagent has a narrow scope with less context to track.
+3. **Independence** - Subagents do not interfere with each other thanks to `Workspace: "branch"`.
+4. **Speed** - Resolve 3 major issues in the same time it takes to resolve 1.
 
 ## Verification
 
-After agents return:
-1. **Review each summary** - Understand what changed
-2. **Check for conflicts** - Did agents edit same code?
-3. **Run full suite** - Verify all fixes work together
-4. **Spot check** - Agents can make systematic errors
-
-## Real-World Impact
-
-From debugging session (2025-10-03):
-- 6 failures across 3 files
-- 3 agents dispatched in parallel
-- All investigations completed concurrently
-- All fixes integrated successfully
-- Zero conflicts between agent changes
+After subagents respond:
+1. **Evaluate each summary** - Clearly understand what was changed.
+2. **Check for conflicts** - Did any subagents modify the same lines of code?
+3. **Run the full test suite** - Ensure all solutions work harmoniously together.

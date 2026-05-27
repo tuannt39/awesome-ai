@@ -1,61 +1,60 @@
-# Spec Compliance Reviewer Prompt Template
+# Prompt Template for Spec Compliance Reviewer Subagent
 
-Use this template when dispatching a spec compliance reviewer subagent.
+Use this template when dispatching a subagent to evaluate specification compliance.
 
-**Purpose:** Verify implementer built what was requested (nothing more, nothing less)
+**Purpose:** Verify if the implementer built exactly what was requested (nothing more, nothing less).
 
 ```
-Task tool (general-purpose):
-  description: "Review spec compliance for Task N"
-  prompt: |
-    You are reviewing whether an implementation matches its specification.
+invoke_subagent (TypeName: "research" or "self"):
+  Role: "Evaluate Spec Compliance for Task N"
+  Prompt: |
+    You are evaluating whether an implementation matches the original specification (requirements).
 
     ## What Was Requested
 
-    [FULL TEXT of task requirements]
+    [FULL TEXT of the task requirements]
 
-    ## What Implementer Claims They Built
+    ## What the Implementer Reports They Built
 
-    [From implementer's report]
+    [Extract from the implementer's report]
 
-    ## CRITICAL: Do Not Trust the Report
+    ## IMPORTANT: Do Not Trust the Report Blindly
 
-    The implementer finished suspiciously quickly. Their report may be incomplete,
-    inaccurate, or optimistic. You MUST verify everything independently.
+    The implementer may have completed the work suspiciously fast. Their report might be incomplete, inaccurate, or overly optimistic. You MUST independently verify everything.
 
-    **DO NOT:**
-    - Take their word for what they implemented
-    - Trust their claims about completeness
-    - Accept their interpretation of requirements
+    **ABSOLUTELY DO NOT:**
+    - Just take their word for what they implemented.
+    - Trust their claims of completeness without examining the codebase.
+    - Accept their interpretation of requirements without cross-referencing the original spec.
 
     **DO:**
-    - Read the actual code they wrote
-    - Compare actual implementation to requirements line by line
-    - Check for missing pieces they claimed to implement
-    - Look for extra features they didn't mention
+    - Directly read the actual code they wrote.
+    - Compare the actual implementation against the spec requirements line-by-line.
+    - Check if any parts they claim to have implemented are actually missing.
+    - Look for extra (redundant) features they didn't mention or the spec didn't request.
 
-    ## Your Job
+    ## Your Mission
 
-    Read the implementation code and verify:
+    Read the actual implemented code and verify:
 
-    **Missing requirements:**
-    - Did they implement everything that was requested?
-    - Are there requirements they skipped or missed?
-    - Did they claim something works but didn't actually implement it?
+    **Missing Requirements:**
+    - Did they implement everything requested?
+    - Were any requirements ignored or forgotten?
+    - Did they claim a feature works but failed to fully implement it in reality?
 
-    **Extra/unneeded work:**
-    - Did they build things that weren't requested?
+    **Redundant/Unnecessary Work:**
+    - Did they build things that were not requested?
     - Did they over-engineer or add unnecessary features?
-    - Did they add "nice to haves" that weren't in spec?
+    - Did they add "nice-to-have" features not in the spec?
 
-    **Misunderstandings:**
-    - Did they interpret requirements differently than intended?
+    **Misinterpretations:**
+    - Did they interpret requirements differently than originally intended?
     - Did they solve the wrong problem?
-    - Did they implement the right feature but wrong way?
+    - Did they implement the correct feature but in a completely wrong way?
 
-    **Verify by reading code, not by trusting report.**
+    **Verify by reading the actual code, do not trust the report.**
 
-    Report:
-    - ✅ Spec compliant (if everything matches after code inspection)
-    - ❌ Issues found: [list specifically what's missing or extra, with file:line references]
+    Response Format:
+    - ✅ Spec compliant (only if all requirements match precisely after you check the code)
+    - ❌ Issues detected: [List specifically what is missing or redundant, with file:line references]
 ```

@@ -7,9 +7,9 @@ Use this template when dispatching a plan document reviewer subagent.
 **Dispatch after:** The complete plan is written.
 
 ```
-Task tool (general-purpose):
-  description: "Review plan document"
-  prompt: |
+Subagent dispatch (invoke_subagent with TypeName "self" or "research"):
+  Role: "Plan Document Reviewer"
+  Prompt: |
     You are a plan document reviewer. Verify this plan is complete and ready for implementation.
 
     **Plan to review:** [PLAN_FILE_PATH]

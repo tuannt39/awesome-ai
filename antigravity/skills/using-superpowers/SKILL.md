@@ -25,19 +25,21 @@ Superpowers skills override default system prompt behavior, but **user instructi
 
 If CLAUDE.md, GEMINI.md, or AGENTS.md says "don't use TDD" and a skill says "always use TDD," follow the user's instructions. The user is in control.
 
+## Mandatory Language Rule
+* **All communication, planning, and responses to the user MUST be in standard Vietnamese.** Keep it clear, concise, evidence-based, and do not expand the scope of work.
+
 ## How to Access Skills
 
-**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.
+**In Antigravity CLI:**
+* You **MUST** use the `view_file` tool with the parameter `IsSkillFile: true` on the `SKILL.md` file of the corresponding skill to activate it.
+* Absolutely do not use a standard `view_file` call (without passing `IsSkillFile: true`) or other file-reading tools to load skills.
+* The list of available skills and their corresponding paths are listed in the system prompt.
 
-**In Copilot CLI:** Use the `skill` tool. Skills are auto-discovered from installed plugins. The `skill` tool works the same as Claude Code's `Skill` tool.
+## Platform Adaptation & Tool Mapping
 
-**In Gemini CLI:** Skills activate via the `activate_skill` tool. Gemini loads skill metadata at session start and activates the full content on demand.
-
-**In other environments:** Check your platform's documentation for how skills are loaded.
-
-## Platform Adaptation
-
-Skills use Claude Code tool names. Non-CC platforms: see `references/copilot-tools.md` (Copilot CLI), `references/codex-tools.md` (Codex) for tool equivalents. Gemini CLI users get the tool mapping loaded automatically via GEMINI.md.
+* **Target Platform:** Antigravity CLI.
+* **Tool Mapping:** Original skills may refer to Claude Code tool names. When executing on Antigravity CLI, you are required to look up and map them to the corresponding Antigravity CLI tools defined specifically in the [references/antigravity-tools.md](file:///C:/Users/tuannt21/.gemini/antigravity-cli/references/antigravity-tools.md) file.
+* **Task List Management (Checklist):** Instead of using `TodoWrite` tools from other platforms, in Antigravity CLI you **MUST use the artifact file `task.md` at `<artifactDir>/task.md`** to track and manage task status.
 
 # Using Skills
 
@@ -52,12 +54,12 @@ digraph skill_flow {
     "Already brainstormed?" [shape=diamond];
     "Invoke brainstorming skill" [shape=box];
     "Might any skill apply?" [shape=diamond];
-    "Invoke Skill tool" [shape=box];
+    "Invoke Skill tool (view_file with IsSkillFile: true)" [shape=box];
     "Announce: 'Using [skill] to [purpose]'" [shape=box];
     "Has checklist?" [shape=diamond];
-    "Create TodoWrite todo per item" [shape=box];
+    "Create or update artifact task.md" [shape=box];
     "Follow skill exactly" [shape=box];
-    "Respond (including clarifications)" [shape=doublecircle];
+    "Respond in Vietnamese (including clarifications)" [shape=doublecircle];
 
     "About to EnterPlanMode?" -> "Already brainstormed?";
     "Already brainstormed?" -> "Invoke brainstorming skill" [label="no"];
@@ -65,13 +67,13 @@ digraph skill_flow {
     "Invoke brainstorming skill" -> "Might any skill apply?";
 
     "User message received" -> "Might any skill apply?";
-    "Might any skill apply?" -> "Invoke Skill tool" [label="yes, even 1%"];
-    "Might any skill apply?" -> "Respond (including clarifications)" [label="definitely not"];
-    "Invoke Skill tool" -> "Announce: 'Using [skill] to [purpose]'";
+    "Might any skill apply?" -> "Invoke Skill tool (view_file with IsSkillFile: true)" [label="yes, even 1%"];
+    "Might any skill apply?" -> "Respond in Vietnamese (including clarifications)" [label="definitely not"];
+    "Invoke Skill tool (view_file with IsSkillFile: true)" -> "Announce: 'Using [skill] to [purpose]'";
     "Announce: 'Using [skill] to [purpose]'" -> "Has checklist?";
-    "Has checklist?" -> "Create TodoWrite todo per item" [label="yes"];
+    "Has checklist?" -> "Create or update artifact task.md" [label="yes"];
     "Has checklist?" -> "Follow skill exactly" [label="no"];
-    "Create TodoWrite todo per item" -> "Follow skill exactly";
+    "Create or update artifact task.md" -> "Follow skill exactly";
 }
 ```
 

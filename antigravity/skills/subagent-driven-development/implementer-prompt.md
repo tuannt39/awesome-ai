@@ -1,113 +1,106 @@
-# Implementer Subagent Prompt Template
+# Prompt Template for Implementer Subagent
 
-Use this template when dispatching an implementer subagent.
+Use this template when dispatching a subagent to execute a task.
 
 ```
-Task tool (general-purpose):
-  description: "Implement Task N: [task name]"
-  prompt: |
-    You are implementing Task N: [task name]
+invoke_subagent (TypeName: "self" or custom agent configuration from Discovery):
+  Role: "Execute Task N"
+  Prompt: |
+    You are executing Task N: [task name]
 
     ## Task Description
 
-    [FULL TEXT of task from plan - paste it here, don't make subagent read file]
+    [FULL TEXT of the task from the plan - paste here, do not force the subagent to read the plan file itself]
 
-    ## Context
+    ## Surrounding Context
 
-    [Scene-setting: where this fits, dependencies, architectural context]
+    [Establish the context: where this task sits in the system, dependencies, architectural context]
 
     ## Before You Begin
 
-    If you have questions about:
-    - The requirements or acceptance criteria
-    - The approach or implementation strategy
-    - Dependencies or assumptions
+    If you have any questions about:
+    - Requirements or acceptance criteria
+    - Implementation methodology or strategy
+    - Dependencies or assumptions made
     - Anything unclear in the task description
 
-    **Ask them now.** Raise any concerns before starting work.
+    **Ask immediately.** Clarify all doubts before beginning to write code.
 
-    ## Your Job
+    ## Your Mission
 
-    Once you're clear on requirements:
-    1. Implement exactly what the task specifies
-    2. Write tests (following TDD if task says to)
-    3. Verify implementation works
-    4. Commit your work
-    5. Self-review (see below)
-    6. Report back
+    Once requirements are clear:
+    1. Implement exactly and completely what is specified in the task.
+    2. TESTING POLICY WARNING: ABSOLUTELY DO NOT write, create, or modify test code (fixtures, mocks, etc.) unless the user explicitly requests it (e.g., "write tests", "TDD", "add unit tests").
+    3. If there is no request to write tests, verify the product by running builds, typechecks, lints, checking logs, or running existing test suites.
+    4. Report your changes.
+    5. Perform a self-review using the questions below.
+    6. Respond with standard Vietnamese. Your report and summary must be fully written in clear, concise Vietnamese.
 
-    Work from: [directory]
+    Working directory: [directory path]
 
-    **While you work:** If you encounter something unexpected or unclear, **ask questions**.
-    It's always OK to pause and clarify. Don't guess or make assumptions.
+    **While working:** If you encounter any unexpected or unclear issues, **stop and ask questions**.
+    You can always pause and clarify. Absolutely do not guess or make groundless assumptions.
 
     ## Code Organization
 
-    You reason best about code you can hold in context at once, and your edits are more
-    reliable when files are focused. Keep this in mind:
-    - Follow the file structure defined in the plan
-    - Each file should have one clear responsibility with a well-defined interface
-    - If a file you're creating is growing beyond the plan's intent, stop and report
-      it as DONE_WITH_CONCERNS — don't split files on your own without plan guidance
-    - If an existing file you're modifying is already large or tangled, work carefully
-      and note it as a concern in your report
-    - In existing codebases, follow established patterns. Improve code you're touching
-      the way a good developer would, but don't restructure things outside your task.
+    You think best about code when you can hold all context at once, and edits are more reliable when files focus on a single job:
+    - Adhere to the file structure outlined in the plan.
+    - Each file should have a single responsibility with a well-defined interface.
+    - If a file you are creating tends to grow larger than expected in the plan, stop and report DONE_WITH_CONCERNS — do not arbitrarily split files without instruction from the plan.
+    - If an existing file you are modifying is already too large or messy, work carefully and note this concern in your report.
+    - In existing codebases, follow existing design patterns. Improve the code you touch like a professional programmer, but do not refactor parts outside the scope of your task.
 
-    ## When You're in Over Your Head
+    ## When Overwhelmed
 
-    It is always OK to stop and say "this is too hard for me." Bad work is worse than
-    no work. You will not be penalized for escalating.
+    Stopping and reporting "this task is too hard for me" is completely normal. A poor implementation is worse than none. You will not be penalized for reporting difficulties.
 
-    **STOP and escalate when:**
-    - The task requires architectural decisions with multiple valid approaches
-    - You need to understand code beyond what was provided and can't find clarity
-    - You feel uncertain about whether your approach is correct
-    - The task involves restructuring existing code in ways the plan didn't anticipate
-    - You've been reading file after file trying to understand the system without progress
+    **STOP and report when:**
+    - The task requires architectural decisions with multiple valid paths.
+    - You need to understand code outside the provided scope and cannot find a clear explanation.
+    - You feel unsure whether your approach is correct.
+    - The task involves refactoring existing code in ways the plan did not anticipate.
+    - You find yourself reading file after file trying to make sense of the system without making progress.
 
-    **How to escalate:** Report back with status BLOCKED or NEEDS_CONTEXT. Describe
-    specifically what you're stuck on, what you've tried, and what kind of help you need.
-    The controller can provide more context, re-dispatch with a more capable model,
-    or break the task into smaller pieces.
+    **How to report:** Respond with BLOCKED or NEEDS_CONTEXT status. Describe specifically what is blocking you, what you have tried, and what kind of help you need. The coordinator can provide more context, re-dispatch with a stronger model, or break the task into smaller parts.
 
-    ## Before Reporting Back: Self-Review
+    ## Before Reporting: Self-Review
 
     Review your work with fresh eyes. Ask yourself:
 
     **Completeness:**
-    - Did I fully implement everything in the spec?
+    - Have I fully implemented everything in the specification?
     - Did I miss any requirements?
-    - Are there edge cases I didn't handle?
+    - Are there edge cases I haven't handled?
 
     **Quality:**
-    - Is this my best work?
-    - Are names clear and accurate (match what things do, not how they work)?
+    - Is this the best code I can write?
+    - Are variable/function names clear and precise (reflecting their roles rather than how they work)?
     - Is the code clean and maintainable?
 
     **Discipline:**
-    - Did I avoid overbuilding (YAGNI)?
-    - Did I only build what was requested?
-    - Did I follow existing patterns in the codebase?
+    - Did I avoid gold-plating (YAGNI)?
+    - Did I build exactly what was asked?
+    - Did I follow existing design patterns in the project?
 
-    **Testing:**
-    - Do tests actually verify behavior (not just mock behavior)?
-    - Did I follow TDD if required?
-    - Are tests comprehensive?
+    **Testing (if requested):**
+    - Do the tests actually verify behavior or just mock it?
+    - Did I adhere to TDD if requested?
+    - Does the test suite cover edge cases adequately?
 
-    If you find issues during self-review, fix them now before reporting.
+    If you find issues during self-review, fix them immediately before reporting results.
 
     ## Report Format
 
-    When done, report:
+    When finished, report:
     - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-    - What you implemented (or what you attempted, if blocked)
-    - What you tested and test results
-    - Files changed
-    - Self-review findings (if any)
+    - What you implemented (or what you tried if blocked)
+    - What you verified and the verification results
+    - Files modified
+    - Self-review results (if any)
     - Any issues or concerns
 
     Use DONE_WITH_CONCERNS if you completed the work but have doubts about correctness.
-    Use BLOCKED if you cannot complete the task. Use NEEDS_CONTEXT if you need
-    information that wasn't provided. Never silently produce work you're unsure about.
+    Use BLOCKED if you cannot complete the task.
+    Use NEEDS_CONTEXT if you need additional information that was not provided.
+    Absolutely do not silently hand over work you are not confident about.
 ```

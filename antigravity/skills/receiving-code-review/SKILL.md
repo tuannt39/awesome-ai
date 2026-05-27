@@ -1,213 +1,173 @@
 ---
 name: receiving-code-review
-description: Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation
+description: Use when receiving code review feedback, before implementing suggested changes, especially when feedback is unclear or technically problematic.
 ---
 
 # Code Review Reception
 
 ## Overview
 
-Code review requires technical evaluation, not emotional performance.
+Code review requires rigorous technical evaluation, not a social emotional performance.
 
-**Core principle:** Verify before implementing. Ask before assuming. Technical correctness over social comfort.
+**Core Principle:** Verify before executing. Clarify before assuming. Ensure technical correctness rises above social politeness.
 
 ## The Response Pattern
 
 ```
 WHEN receiving code review feedback:
 
-1. READ: Complete feedback without reacting
-2. UNDERSTAND: Restate requirement in own words (or ask)
-3. VERIFY: Check against codebase reality
-4. EVALUATE: Technically sound for THIS codebase?
-5. RESPOND: Technical acknowledgment or reasoned pushback
-6. IMPLEMENT: One item at a time, test each
+1. READ: Read the entire feedback without reacting immediately
+2. UNDERSTAND: Restate the request in your own words (or ask if unclear)
+3. VERIFY: Cross-reference with the reality of the current codebase
+4. EVALUATE: Is this proposal technically logical for THIS codebase?
+5. RESPOND: Confirm technically or offer a well-reasoned counter-argument
+6. IMPLEMENT: Address items one by one, verifying carefully after each change
 ```
 
-## Forbidden Responses
+## Banned Responses
 
-**NEVER:**
-- "You're absolutely right!" (explicit CLAUDE.md violation)
-- "Great point!" / "Excellent feedback!" (performative)
-- "Let me implement that now" (before verification)
+**ABSOLUTELY DO NOT say:**
+- "You are completely right!" (a clear violation of automatically agreeing without verification)
+- "Great idea!" / "Excellent feedback!" (empty, social platitudes)
+- "Let me fix it right now" (prior to technical verification)
 
 **INSTEAD:**
-- Restate the technical requirement
-- Ask clarifying questions
-- Push back with technical reasoning if wrong
-- Just start working (actions > words)
+- Clear restate the technical requirement.
+- Ask questions to clarify ambiguous points.
+- Counter-argue with clear technical logic and evidence if the suggestion is incorrect.
+- Get straight to implementation (action speaks louder than empty social words).
 
-## Handling Unclear Feedback
+## Handling Ambiguous Feedback
 
 ```
 IF any item is unclear:
-  STOP - do not implement anything yet
-  ASK for clarification on unclear items
+  STOP - do not implement any changes yet
+  ASK your partner to clarify those unclear items
 
-WHY: Items may be related. Partial understanding = wrong implementation.
+REASON: Items may be closely coupled. Partial understanding leads to incorrect implementation.
 ```
 
 **Example:**
 ```
-your human partner: "Fix 1-6"
-You understand 1,2,3,6. Unclear on 4,5.
+Partner: "Please fix items 1 through 6"
+You understand items 1, 2, 3, 6. Unclear on items 4 and 5.
 
-❌ WRONG: Implement 1,2,3,6 now, ask about 4,5 later
-✅ RIGHT: "I understand items 1,2,3,6. Need clarification on 4 and 5 before proceeding."
+❌ WRONG: Fix items 1, 2, 3, 6 now, then ask about 4 and 5 later.
+✅ RIGHT: "I clearly understand items 1, 2, 3, 6. Please clarify items 4 and 5 before I begin implementation."
 ```
 
-## Source-Specific Handling
+## Handling by Feedback Source
 
-### From your human partner
-- **Trusted** - implement after understanding
-- **Still ask** if scope unclear
-- **No performative agreement**
-- **Skip to action** or technical acknowledgment
+### From Your Partner (Human Partner)
+- **High reliability** - implement once you clearly understand the requirement.
+- **Still ask questions** if the scope of work is unclear.
+- **Do not use empty social platitudes**.
+- **Go straight to action** or brief technical confirmation.
 
 ### From External Reviewers
 ```
 BEFORE implementing:
-  1. Check: Technically correct for THIS codebase?
-  2. Check: Breaks existing functionality?
-  3. Check: Reason for current implementation?
-  4. Check: Works on all platforms/versions?
-  5. Check: Does reviewer understand full context?
+  1. Check: Is it technically correct for THIS codebase?
+  2. Check: Will it break existing functionality?
+  3. Check: What was the rationale for the current implementation?
+  4. Check: Does it run well on all platforms/versions?
+  5. Check: Does the reviewer have the full context?
 
-IF suggestion seems wrong:
-  Push back with technical reasoning
+IF the suggestion is incorrect:
+  Politely counter-argue with clear technical reasoning.
 
-IF can't easily verify:
-  Say so: "I can't verify this without [X]. Should I [investigate/ask/proceed]?"
+IF it cannot be easily verified:
+  State clearly: "I cannot verify this without [X]. Should I [investigate further/ask/continue]?"
 
-IF conflicts with your human partner's prior decisions:
-  Stop and discuss with your human partner first
+IF it conflicts with your partner's previous decisions:
+  Stop and discuss with your partner first.
 ```
 
-**your human partner's rule:** "External feedback - be skeptical, but check carefully"
+**Core Principle:** "External feedback - be scientifically skeptical, but verify very carefully."
 
 ## YAGNI Check for "Professional" Features
 
 ```
-IF reviewer suggests "implementing properly":
-  grep codebase for actual usage
+IF the reviewer suggests "more professional/robust implementation" (e.g., adding complex abstraction layers):
+  Search (grep) the codebase to see if that structure is actually needed.
 
-  IF unused: "This endpoint isn't called. Remove it (YAGNI)?"
-  IF used: Then implement properly
+  IF not yet used: "This structure is not currently utilized. Can we omit it to comply with YAGNI?"
+  IF truly necessary: Implement in a minimalist and standard way.
 ```
 
-**your human partner's rule:** "You and reviewer both report to me. If we don't need this feature, don't add it."
+**Rule:** "We only build what is truly necessary right now (YAGNI)."
 
-## Implementation Order
+## Order of Modification Implementation
 
 ```
-FOR multi-item feedback:
-  1. Clarify anything unclear FIRST
-  2. Then implement in this order:
-     - Blocking issues (breaks, security)
-     - Simple fixes (typos, imports)
-     - Complex fixes (refactoring, logic)
-  3. Test each fix individually
-  4. Verify no regressions
+WITH multi-item feedback:
+  1. Clarify all ambiguous points FIRST.
+  2. Implement in the following priority:
+     - Critical issues (system-breaking, security)
+     - Simple changes (typos, redundant imports)
+     - Complex changes (logic refactoring, architecture)
+  3. Verify carefully after each item is fixed.
+  4. Ensure no regression occurs.
 ```
 
-## When To Push Back
+## When to Counter-Argue
 
-Push back when:
-- Suggestion breaks existing functionality
-- Reviewer lacks full context
-- Violates YAGNI (unused feature)
-- Technically incorrect for this stack
-- Legacy/compatibility reasons exist
-- Conflicts with your human partner's architectural decisions
+Counter-argue when the suggestion:
+- Breaks features that are currently working well.
+- The reviewer lacks global context of the project.
+- Violates the YAGNI principle (adds unused features).
+- Is technically incorrect for the current tech stack.
+- Conflicts with architectural decisions agreed upon with your partner.
 
-**How to push back:**
-- Use technical reasoning, not defensiveness
-- Ask specific questions
-- Reference working tests/code
-- Involve your human partner if architectural
+**How to counter-argue:**
+- Use objective technical arguments, without defensiveness or stubbornness.
+- Ask specific technical questions.
+- Provide evidence from tests or currently working code blocks.
 
-**Signal if uncomfortable pushing back out loud:** "Strange things are afoot at the Circle K"
+## How to Confirm Feedback Correctly
 
-## Acknowledging Correct Feedback
-
-When feedback IS correct:
+When the reviewer's feedback is correct and helpful:
 ```
 ✅ "Fixed. [Brief description of what changed]"
-✅ "Good catch - [specific issue]. Fixed in [location]."
-✅ [Just fix it and show in the code]
+✅ "Spot on suggestion - [state the issue]. Fixed at [file path]."
+✅ [Simply fix the issue and point to the results in the code]
 
-❌ "You're absolutely right!"
-❌ "Great point!"
-❌ "Thanks for catching that!"
-❌ "Thanks for [anything]"
-❌ ANY gratitude expression
+❌ "You are completely right!"
+❌ "Great idea!"
+❌ "Thank you for finding this!"
+❌ ANY other empty expressions of gratitude.
 ```
 
-**Why no thanks:** Actions speak. Just fix it. The code itself shows you heard the feedback.
+**Why empty thank-yous are unnecessary:** Actual actions are more valuable than words. Correctly fixing issues in the codebase is the best evidence that you took the feedback seriously.
 
-**If you catch yourself about to write "Thanks":** DELETE IT. State the fix instead.
+## Correcting Your Counter-Argument When You Make a Mistake
 
-## Gracefully Correcting Your Pushback
-
-If you pushed back and were wrong:
+If you counter-argued but later realized you were wrong:
 ```
-✅ "You were right - I checked [X] and it does [Y]. Implementing now."
-✅ "Verified this and you're correct. My initial understanding was wrong because [reason]. Fixing."
+✅ "You were right - I rechecked [X] and it indeed behaves as [Y]. Implementing the fix now."
+✅ "Verified and you are correct. My initial understanding was incorrect due to [reason]. Fixing now."
 
-❌ Long apology
-❌ Defending why you pushed back
-❌ Over-explaining
+❌ Long-winded apologies, round-about explanations.
+❌ Trying to excuse your misunderstanding.
 ```
 
-State the correction factually and move on.
+Acknowledge the fact briefly, objectively, and focus on the solution.
 
 ## Common Mistakes
 
-| Mistake | Fix |
-|---------|-----|
-| Performative agreement | State requirement or just act |
-| Blind implementation | Verify against codebase first |
-| Batch without testing | One at a time, test each |
-| Assuming reviewer is right | Check if breaks things |
-| Avoiding pushback | Technical correctness > comfort |
-| Partial implementation | Clarify all items first |
-| Can't verify, proceed anyway | State limitation, ask for direction |
+| Mistake | How to Fix |
+| :--- | :--- |
+| Empty social platitudes | Restate technical requirements or act immediately |
+| Blind implementation | Verify thoroughly with the codebase before modifying |
+| Bulk editing without verification | Modify items one by one, verifying carefully |
+| Assuming the reviewer is always right | Check if modifications break the system |
+| Avoiding counter-arguments | Prioritize technical correctness over avoiding conflict |
+| Half-baked implementation | Clarify all misunderstood items before starting |
 
-## Real Examples
+## Core Takeaway
 
-**Performative Agreement (Bad):**
-```
-Reviewer: "Remove legacy code"
-❌ "You're absolutely right! Let me remove that..."
-```
+**Feedback from external sources = Suggestions to be objectively evaluated, not commands to be blindly obeyed.**
 
-**Technical Verification (Good):**
-```
-Reviewer: "Remove legacy code"
-✅ "Checking... build target is 10.15+, this API needs 13+. Need legacy for backward compat. Current impl has wrong bundle ID - fix it or drop pre-13 support?"
-```
+Verify. Scientifically question. Then implement.
 
-**YAGNI (Good):**
-```
-Reviewer: "Implement proper metrics tracking with database, date filters, CSV export"
-✅ "Grepped codebase - nothing calls this endpoint. Remove it (YAGNI)? Or is there usage I'm missing?"
-```
-
-**Unclear Item (Good):**
-```
-your human partner: "Fix items 1-6"
-You understand 1,2,3,6. Unclear on 4,5.
-✅ "Understand 1,2,3,6. Need clarification on 4 and 5 before implementing."
-```
-
-## GitHub Thread Replies
-
-When replying to inline review comments on GitHub, reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
-
-## The Bottom Line
-
-**External feedback = suggestions to evaluate, not orders to follow.**
-
-Verify. Question. Then implement.
-
-No performative agreement. Technical rigor always.
+No empty social platitudes. Always maintain technical rigor.
