@@ -1,4 +1,4 @@
-﻿---
+---
 name: opensource-forker
 description: Fork any project for open-sourcing. Copies files, strips secrets and credentials (20+ patterns), replaces internal references with placeholders, generates .env.example, and cleans git history. First stage of the opensource-pipeline skill.
 tools: ["bash", "edit", "write"]
@@ -46,7 +46,7 @@ find SOURCE_DIR -type f | grep -v node_modules | grep -v .git | grep -v __pycach
 mkdir -p TARGET_DIR
 rsync -av --exclude='.git' --exclude='node_modules' --exclude='__pycache__' \
   --exclude='.env*' --exclude='*.pyc' --exclude='.venv' --exclude='venv' \
-  --exclude='.Antigravity/' --exclude='.secrets/' --exclude='secrets/' \
+  --exclude='.gemini/antigravity-cli/' --exclude='.secrets/' --exclude='secrets/' \
   SOURCE_DIR/ TARGET_DIR/
 ```
 
@@ -95,7 +95,7 @@ key-[A-Za-z0-9]{32}
 - `*.pem`, `*.key`, `*.p12`, `*.pfx` (private keys)
 - `credentials.json`, `service-account.json`
 - `.secrets/`, `secrets/`
-- `.Antigravity/settings.json`
+- `.gemini/antigravity-cli/settings.json`
 - `sessions/`
 - `*.map` (source maps expose original source structure and file paths)
 

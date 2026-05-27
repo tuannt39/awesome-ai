@@ -1,4 +1,4 @@
-﻿---
+---
 paths:
   - "**/*.pl"
   - "**/*.pm"
@@ -12,7 +12,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.Antigravity/settings.json`:
+Configure in `~/.gemini/antigravity-cli/settings.json`:
 
 - **perltidy**: Auto-format `.pl` and `.pm` files after edit
 - **perlcritic**: Run lint check after editing `.pm` files

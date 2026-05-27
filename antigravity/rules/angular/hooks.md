@@ -1,4 +1,4 @@
-﻿---
+---
 paths:
   - "**/*.component.ts"
   - "**/*.component.html"
@@ -13,7 +13,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.Antigravity/settings.json`:
+Configure in `~/.gemini/antigravity-cli/settings.json`:
 
 - **Prettier**: Auto-format `.ts` and `.html` files after edit
 - **ESLint / ng lint**: Run `ng lint` after editing Angular source files to catch decorator misuse, template errors, and style violations

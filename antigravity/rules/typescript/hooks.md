@@ -1,4 +1,4 @@
-﻿---
+---
 paths:
   - "**/*.ts"
   - "**/*.tsx"
@@ -11,7 +11,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.Antigravity/settings.json`:
+Configure in `~/.gemini/antigravity-cli/settings.json`:
 
 - **Prettier**: Auto-format JS/TS files after edit
 - **TypeScript check**: Run `tsc` after editing `.ts`/`.tsx` files

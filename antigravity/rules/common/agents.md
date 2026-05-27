@@ -1,8 +1,8 @@
-﻿# Agent Orchestration
+# Agent Orchestration
 
 ## Available Agents
 
-Located in `~/.Antigravity/agents/`:
+Located in `~/.gemini/antigravity-cli/agents/`:
 
 | Agent | Purpose | When to Use |
 |-------|---------|-------------|

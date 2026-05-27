@@ -1,8 +1,8 @@
-﻿# 代理编排
+# 代理编排
 
 ## 可用代理
 
-位于 `~/.Antigravity/agents/`：
+位于 `~/.gemini/antigravity-cli/agents/`：
 
 | 代理 | 用途 | 何时使用 |
 |-------|---------|------------|

@@ -1,4 +1,4 @@
-﻿---
+---
 paths:
   - "**/*.swift"
   - "**/Package.swift"
@@ -9,7 +9,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.Antigravity/settings.json`:
+Configure in `~/.gemini/antigravity-cli/settings.json`:
 
 - **SwiftFormat**: Auto-format `.swift` files after edit
 - **SwiftLint**: Run lint checks after editing `.swift` files

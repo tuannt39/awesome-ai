@@ -1,4 +1,4 @@
-﻿# Rules
+# Rules
 ## Structure
 
 Rules are organized into a **common** layer plus **language-specific** directories:
@@ -62,21 +62,21 @@ rules/
 
 ```bash
 # Create the ECC rule namespace once.
-mkdir -p ~/.Antigravity/rules/ecc
+mkdir -p ~/.gemini/antigravity-cli/rules/ecc
 
 # Install common rules (required for all projects)
-cp -r rules/common ~/.Antigravity/rules/ecc/
+cp -r rules/common ~/.gemini/antigravity-cli/rules/ecc/
 
 # Install language-specific rules based on your project's tech stack
-cp -r rules/typescript ~/.Antigravity/rules/ecc/
-cp -r rules/angular ~/.Antigravity/rules/ecc/
-cp -r rules/python ~/.Antigravity/rules/ecc/
-cp -r rules/golang ~/.Antigravity/rules/ecc/
-cp -r rules/web ~/.Antigravity/rules/ecc/
-cp -r rules/swift ~/.Antigravity/rules/ecc/
-cp -r rules/php ~/.Antigravity/rules/ecc/
-cp -r rules/ruby ~/.Antigravity/rules/ecc/
-cp -r rules/arkts ~/.Antigravity/rules/ecc/
+cp -r rules/typescript ~/.gemini/antigravity-cli/rules/ecc/
+cp -r rules/angular ~/.gemini/antigravity-cli/rules/ecc/
+cp -r rules/python ~/.gemini/antigravity-cli/rules/ecc/
+cp -r rules/golang ~/.gemini/antigravity-cli/rules/ecc/
+cp -r rules/web ~/.gemini/antigravity-cli/rules/ecc/
+cp -r rules/swift ~/.gemini/antigravity-cli/rules/ecc/
+cp -r rules/php ~/.gemini/antigravity-cli/rules/ecc/
+cp -r rules/ruby ~/.gemini/antigravity-cli/rules/ecc/
+cp -r rules/arkts ~/.gemini/antigravity-cli/rules/ecc/
 
 # Attention ! ! ! Configure according to your actual project requirements; the configuration here is for reference only.
 ```
@@ -84,9 +84,9 @@ cp -r rules/arkts ~/.Antigravity/rules/ecc/
 For project-local rules, use the same namespace under the project root:
 
 ```bash
-mkdir -p .Antigravity/rules/ecc
-cp -r rules/common .Antigravity/rules/ecc/
-cp -r rules/typescript .Antigravity/rules/ecc/
+mkdir -p .gemini/antigravity-cli/rules/ecc
+cp -r rules/common .gemini/antigravity-cli/rules/ecc/
+cp -r rules/typescript .gemini/antigravity-cli/rules/ecc/
 ```
 
 ## Rules vs Skills

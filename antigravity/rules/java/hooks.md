@@ -1,4 +1,4 @@
-﻿---
+---
 paths:
   - "**/*.java"
   - "**/pom.xml"
@@ -11,7 +11,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.Antigravity/settings.json`:
+Configure in `~/.gemini/antigravity-cli/settings.json`:
 
 - **google-java-format**: Auto-format `.java` files after edit
 - **checkstyle**: Run style checks after editing Java files

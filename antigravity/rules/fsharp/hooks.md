@@ -1,4 +1,4 @@
-﻿---
+---
 paths:
   - "**/*.fs"
   - "**/*.fsx"
@@ -14,7 +14,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.Antigravity/settings.json`:
+Configure in `~/.gemini/antigravity-cli/settings.json`:
 
 - **fantomas**: Auto-format edited F# files
 - **dotnet build**: Verify the solution or project still compiles after edits

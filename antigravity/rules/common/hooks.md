@@ -1,4 +1,4 @@
-﻿# Hooks System
+# Hooks System
 
 ## Hook Types
 
@@ -12,7 +12,7 @@ Use with caution:
 - Enable for trusted, well-defined plans
 - Disable for exploratory work
 - Never use dangerously-skip-permissions flag
-- Configure `allowedTools` in `~/.Antigravity.json` instead
+- Configure `allowedTools` in `~/.gemini/antigravity-cli/settings.json` instead
 
 ## artifact task.md Best Practices
 

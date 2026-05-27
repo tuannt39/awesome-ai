@@ -1,4 +1,4 @@
-﻿# 性能优化
+# 性能优化
 
 ## 模型选择策略
 
@@ -36,7 +36,7 @@
 
 通过以下方式控制扩展思考：
 - **切换**：Option+T（macOS）/ Alt+T（Windows/Linux）
-- **配置**：在 `~/.Antigravity/settings.json` 中设置 `alwaysThinkingEnabled`
+- **配置**：在 `~/.gemini/antigravity-cli/settings.json` 中设置 `alwaysThinkingEnabled`
 - **预算上限**：`export MAX_THINKING_TOKENS=10000`
 - **详细模式**：Ctrl+O 查看思考输出
 

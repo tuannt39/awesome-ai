@@ -1,4 +1,4 @@
-﻿---
+---
 paths:
   - "**/*.rs"
   - "**/Cargo.toml"
@@ -9,7 +9,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.Antigravity/settings.json`:
+Configure in `~/.gemini/antigravity-cli/settings.json`:
 
 - **cargo fmt**: Auto-format `.rs` files after edit
 - **cargo clippy**: Run lint checks after editing Rust files
