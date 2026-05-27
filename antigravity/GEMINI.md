@@ -48,3 +48,21 @@
   1. Summary of modified files.
   2. Verification commands run and their exact results.
   3. A mandatory test statement (if none were requested): *"Không viết test mới vì người dùng không yêu cầu."* (Recommendations for missing tests belong here as optional follow-ups only).
+
+## 8. Rules System
+- **Rules Directory**: `~/.gemini/antigravity-cli/rules/` contains coding guidelines structured hierarchically:
+  - `rules/common/` — common rules applicable to ALL languages (coding-style, patterns, security, hooks, testing, code-review, git-workflow, agents, performance, development-workflow)
+  - `rules/<language>/` — language-specific rules (typescript, python, dart, golang, java, kotlin, rust, swift, ruby, php, csharp, fsharp, cpp, perl, angular, arkts)
+  - `rules/web/` — web/frontend-specific rules (design-quality, performance, security, coding-style, patterns, hooks, testing)
+- **Lookup Mechanism**: When operating on a code file, the agent MUST look up the appropriate rules:
+  1. Determine the language/domain from the extension of the file being processed (e.g., `.dart` → `dart/`, `.ts` → `typescript/`, `.py` → `python/`)
+  2. Read the corresponding rules in `rules/common/` first (baseline)
+  3. Read the rules in `rules/<language>/` for additions or overrides (language-specific overrides common)
+  4. If working on frontend (HTML/CSS/JS): read `rules/web/` in addition
+- **Lookup Timing**:
+  - Before writing/modifying code: read the corresponding `coding-style.md`, `patterns.md`, and `security.md`
+  - When reviewing code: read `code-review.md` and `security.md`
+  - When configuring hooks/CI: read `hooks.md`
+  - When designing architecture: read `patterns.md` and `development-workflow.md`
+- **Precedence**: Language-specific rules > Common rules (in case of conflicts). User's GEMINI.md rules > Rules files (always takes highest precedence).
+- **Note**: Testing/code-review rules are used to CHECK code quality, and MUST NOT be used as a reason to write new tests (adhering to Section 3).
