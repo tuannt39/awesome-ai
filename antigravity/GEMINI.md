@@ -8,13 +8,13 @@
 ## 2. Planning & Execution Workflow
 - ALWAYS use `/using-superpowers` for non-trivial tasks (Do NOT use default `/planning` mode).
 - **The 5-Step Workflow (Brainstorm -> Approve Spec -> Write Plan -> Approve Plan -> Auto-Execute):**
-  1. **Brainstorm/Spec**: Use the `brainstorming` skill to analyze requirements and design a solution.
-  2. **Mandatory Pause 1 (Approve Spec) - HARD GATE**: After presenting the brainstorm/spec, you MUST output the phrase:
-     *"⏸️ **Chờ duyệt Spec** — Gõ OK hoặc Duyệt để tiếp tục."*
+  1. **Brainstorm/Spec**: Use the `brainstorming` skill to analyze requirements, design a solution. You MUST perform **Dual-Write Sync**: write the Spec file to the project directory (e.g., `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` with `IsArtifact: false`) and simultaneously save a copy to the Brain directory (e.g., `<artifactDir>/analysis_results.md` with `IsArtifact: true` and `ArtifactMetadata` of type `other`).
+  2. **Mandatory Pause 1 (Approve Spec) - HARD GATE**: After presenting the brainstorm/spec, you MUST call the `ask_question` tool to ask the user to approve the Spec (e.g., question: "Duyệt Spec để tiếp tục?", options: ["Duyệt Spec và lập kế hoạch (Plan)", "Cần điều chỉnh thêm"]), and output the phrase:
+     *"⏸️ **Chờ duyệt Spec** — Vui lòng phản hồi hộp thoại trắc nghiệm để tiếp tục."*
      Then IMMEDIATELY STOP ALL TOOL CALLS. Do not call any tool (including `writing-plans`) until the user explicitly responds with approval.
-  3. **Write Plan**: Upon receiving approval for the Spec, AUTOMATICALLY run the `writing-plans` skill to generate a detailed implementation plan.
-  4. **Mandatory Pause 2 (Approve Plan) - HARD GATE**: After writing the implementation plan, you MUST output the phrase:
-     *"⏸️ **Chờ duyệt Plan** — Gõ OK hoặc Duyệt để tiếp tục."*
+  3. **Write Plan**: Upon receiving approval for the Spec, AUTOMATICALLY run the `writing-plans` skill to generate a detailed implementation plan. You MUST perform **Dual-Write Sync**: write the Plan file to the project directory (e.g., `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md` with `IsArtifact: false`) and simultaneously save a copy to the Brain directory (e.g., `<artifactDir>/implementation_plan.md` with `IsArtifact: true` and `ArtifactMetadata` of type `implementation_plan`).
+  4. **Mandatory Pause 2 (Approve Plan) - HARD GATE**: After writing the implementation plan, you MUST call the `ask_question` tool to ask the user to approve the Plan (e.g., question: "Duyệt Plan để tiếp tục?", options: ["Duyệt Plan và thực thi (Execute)", "Cần điều chỉnh thêm"]), and output the phrase:
+     *"⏸️ **Chờ duyệt Plan** — Vui lòng phản hồi hộp thoại trắc nghiệm để tiếp tục."*
      Then IMMEDIATELY STOP ALL TOOL CALLS. Do not call any tool or transition to execution until the user explicitly responds with approval.
   5. **Auto Execution**: Upon receiving approval for the Plan, AUTOMATICALLY transition directly into `subagent-driven-development` for implementation. DO NOT ask the user to choose an execution mode.
 - *Note*: If tests are not requested, plans must explicitly state: *"Không viết test mới; chỉ dùng kiểm chứng không tạo test hoặc chạy test sẵn có nếu phù hợp."*
