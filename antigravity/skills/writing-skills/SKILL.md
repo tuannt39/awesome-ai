@@ -9,7 +9,7 @@ description: Use when creating new skills, editing existing skills, or verifying
 
 **Writing skills is applying Test-Driven Development (TDD) to standard operating procedure documentation.**
 
-**Antigravity CLI personal skills directory:** `/home/tuannt/.gemini/antigravity-cli/skills/`
+**Antigravity CLI personal skills directory:** `~/.gemini/antigravity-cli/skills/`
 
 You write test cases (stress-inducing hypothetical scenarios for subagents), watch them fail (baseline behavior without the skill), write the skill documentation, watch them pass (subagents adhering to the skill), and then refactor (closing argument loopholes).
 

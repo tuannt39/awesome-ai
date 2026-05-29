@@ -32,7 +32,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 **2. Trigger the reviewer subagent:**
 
-Use the Antigravity CLI subagent definition and invocation mechanism (`invoke_subagent` with `TypeName` as `research` or `self`), using the template at `/home/tuannt/.gemini/antigravity-cli/skills/requesting-code-review/code-reviewer.md`.
+Use the Antigravity CLI subagent definition and invocation mechanism (`invoke_subagent` with `TypeName` as `research` or `self`), using the template at `~/.gemini/antigravity-cli/skills/requesting-code-review/code-reviewer.md`.
 
 **Fields to fill:**
 - `{DESCRIPTION}` - A brief summary of what you built or changed.
@@ -59,7 +59,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 [Trigger reviewer subagent via Antigravity CLI]
   DESCRIPTION: Added verifyIndex() and repairIndex() functions supporting 4 common error types.
-  PLAN_OR_REQUIREMENTS: Task 2 in the plan file /home/tuannt/.gemini/antigravity-cli/brain/plans/deployment-plan.md
+  PLAN_OR_REQUIREMENTS: Task 2 in the plan file ~/.gemini/antigravity-cli/brain/plans/deployment-plan.md
   BASE_SHA: a7981ec
   HEAD_SHA: 3df7661
 
@@ -93,4 +93,4 @@ You: [Proceed to add progress indicators to fix the Important issue]
 - Continue implementing new tasks when Important issues remain unresolved.
 - Argue without basis against accurate technical feedback.
 
-See the detailed configuration template at: `/home/tuannt/.gemini/antigravity-cli/skills/requesting-code-review/code-reviewer.md`
+See the detailed configuration template at: `~/.gemini/antigravity-cli/skills/requesting-code-review/code-reviewer.md`
