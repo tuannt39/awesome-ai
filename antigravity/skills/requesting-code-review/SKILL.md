@@ -24,15 +24,15 @@ Trigger a reviewer subagent to catch technical errors before they cause cascadin
 ## How to Request
 
 **1. Retrieve the Git SHA of the changes:**
-```powershell
-# On Windows PowerShell, get the SHA of the previous commit or origin/main as base
-$BASE_SHA = git rev-parse HEAD~1
-$HEAD_SHA = git rev-parse HEAD
+```bash
+# Get the SHA of the previous commit or origin/main as base
+BASE_SHA=$(git rev-parse HEAD~1)
+HEAD_SHA=$(git rev-parse HEAD)
 ```
 
 **2. Trigger the reviewer subagent:**
 
-Use the Antigravity CLI subagent definition and invocation mechanism (`invoke_subagent` with `TypeName` as `research` or `self`), using the template at `C:\Users\tuannt21\.gemini\antigravity-cli\skills\requesting-code-review\code-reviewer.md`.
+Use the Antigravity CLI subagent definition and invocation mechanism (`invoke_subagent` with `TypeName` as `research` or `self`), using the template at `/home/tuannt/.gemini/antigravity-cli/skills/requesting-code-review/code-reviewer.md`.
 
 **Fields to fill:**
 - `{DESCRIPTION}` - A brief summary of what you built or changed.
@@ -53,13 +53,13 @@ Use the Antigravity CLI subagent definition and invocation mechanism (`invoke_su
 
 You: Let me request a code review before moving to the next step.
 
-# Run PowerShell command to get SHAs
-$BASE_SHA = git log --oneline | Select-String "Task 1" | Select-Object -First 1 | ForEach-Object { $_.Line.Split(' ')[0] }
-$HEAD_SHA = git rev-parse HEAD
+# Run bash command to get SHAs
+BASE_SHA=$(git log --oneline | grep "Task 1" | head -1 | cut -d' ' -f1)
+HEAD_SHA=$(git rev-parse HEAD)
 
 [Trigger reviewer subagent via Antigravity CLI]
   DESCRIPTION: Added verifyIndex() and repairIndex() functions supporting 4 common error types.
-  PLAN_OR_REQUIREMENTS: Task 2 in the plan file C:\Users\tuannt21\.gemini\antigravity-cli\brain\plans\deployment-plan.md
+  PLAN_OR_REQUIREMENTS: Task 2 in the plan file /home/tuannt/.gemini/antigravity-cli/brain/plans/deployment-plan.md
   BASE_SHA: a7981ec
   HEAD_SHA: 3df7661
 
@@ -93,4 +93,4 @@ You: [Proceed to add progress indicators to fix the Important issue]
 - Continue implementing new tasks when Important issues remain unresolved.
 - Argue without basis against accurate technical feedback.
 
-See the detailed configuration template at: `C:\Users\tuannt21\.gemini\antigravity-cli\skills\requesting-code-review\code-reviewer.md`
+See the detailed configuration template at: `/home/tuannt/.gemini/antigravity-cli/skills/requesting-code-review/code-reviewer.md`

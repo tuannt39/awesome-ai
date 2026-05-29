@@ -38,7 +38,7 @@ If CLAUDE.md, GEMINI.md, or AGENTS.md says "don't use TDD" and a skill says "alw
 ## Platform Adaptation & Tool Mapping
 
 * **Target Platform:** Antigravity CLI.
-* **Tool Mapping:** Original skills may refer to Claude Code tool names. When executing on Antigravity CLI, you are required to look up and map them to the corresponding Antigravity CLI tools defined specifically in the [references/antigravity-tools.md](file:///C:/Users/tuannt21/.gemini/antigravity-cli/references/antigravity-tools.md) file.
+* **Tool Mapping:** Original skills may refer to Claude Code tool names. When executing on Antigravity CLI, you are required to look up and map them to the corresponding Antigravity CLI tools defined specifically in the [references/antigravity-tools.md](file:///home/tuannt/.gemini/antigravity-cli/skills/using-superpowers/references/antigravity-tools.md) file.
 * **Task List Management (Checklist):** Instead of using `TodoWrite` tools from other platforms, in Antigravity CLI you **MUST use the artifact file `task.md` at `<artifactDir>/task.md`** to track and manage task status.
 
 # Using Skills
