@@ -90,8 +90,8 @@ digraph process {
 
 ## Subagent Discovery Process
 
-Before defining a subagent using `define_subagent`, you must check the `.gemini/antigravity-cli/agents` directory for a `<name>.md` file:
-1. Check if the agent configuration file `<name>.md` exists in the `.gemini/antigravity-cli/agents` directory.
+Before defining a subagent using `define_subagent`, you must check the `.gemini/antigravity/agents` directory for a `<name>.md` file:
+1. Check if the agent configuration file `<name>.md` exists in the `.gemini/antigravity/agents` directory.
 2. If found, parse its `description` and `tools` to enable the appropriate write file, subagent, or MCP tool permissions, then launch the subagent using that configuration.
 3. If no agent configuration exists, ask the user to create a new definition file or proceed with a suitable temporary configuration.
 

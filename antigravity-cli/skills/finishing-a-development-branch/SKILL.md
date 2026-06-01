@@ -23,8 +23,8 @@ Guides the completion of development work by presenting clear options and handli
 
 **Before presenting options, ensure that all tests pass successfully:**
 
-```powershell
-# Run the project's test suite on Windows PowerShell
+```bash
+# Run the project's test suite
 npm test
 # Or the corresponding commands depending on the project's programming language
 cargo test
@@ -49,10 +49,10 @@ Stop. Absolutely do not proceed to Step 2.
 
 **Determine the state of the workspace before presenting options:**
 
-```powershell
-# On Windows PowerShell, identify the actual git directory
-$GIT_DIR = git rev-parse --git-dir
-$GIT_COMMON = git rev-parse --git-common-dir
+```bash
+# Identify the actual git directory
+GIT_DIR=$(git rev-parse --git-dir)
+GIT_COMMON=$(git rev-parse --git-common-dir)
 ```
 
 This helps determine which options menu to display and how cleanup will be handled later:
@@ -65,7 +65,7 @@ This helps determine which options menu to display and how cleanup will be handl
 
 ### Step 3: Determine the Base Branch
 
-```powershell
+```bash
 # Search for common base branches (main or master)
 git merge-base HEAD main
 # Or ask directly: "This development branch was split from the main branch - is this correct?"
@@ -104,10 +104,10 @@ Please select the corresponding number?
 
 #### Option 1: Local Merge
 
-```powershell
-# Return to the root directory of the main repo to ensure path safety
-$MAIN_ROOT = git rev-parse --show-toplevel
-cd $MAIN_ROOT
+```bash
+# Return to the root directory of the main repo
+MAIN_ROOT=$(git rev-parse --show-toplevel)
+cd "$MAIN_ROOT"
 
 # Perform merge — ensure success before cleaning up anything
 git checkout <base-branch>
@@ -123,12 +123,12 @@ git branch -d <feature-branch>
 
 #### Option 2: Push and Create PR
 
-```powershell
+```bash
 # Push the branch to remote
 git push -u origin <feature-branch>
 
 # Create PR using the official CLI (if gh tool is available)
-gh pr create --title "<summary-title>" --body "## Summary of Changes`n- <list 2-3 key points>`n`n## Verification Plan`n- [ ] <verification steps>"
+gh pr create --title "<summary-title>" --body $'## Summary of Changes\n- <list 2-3 key points>\n\n## Verification Plan\n- [ ] <verification steps>'
 ```
 
 **ABSOLUTELY DO NOT clean up the worktree** — you or your partner may need to keep this environment to make further edits based on code review feedback.
@@ -154,9 +154,9 @@ Please type exactly 'discard' to confirm deletion.
 Wait for the partner to type exactly 'discard'.
 
 If confirmed:
-```powershell
-$MAIN_ROOT = git rev-parse --show-toplevel
-cd $MAIN_ROOT
+```bash
+MAIN_ROOT=$(git rev-parse --show-toplevel)
+cd "$MAIN_ROOT"
 # Perform worktree cleanup (Step 6), then force delete the branch:
 git branch -D <feature-branch>
 ```
@@ -165,17 +165,17 @@ git branch -D <feature-branch>
 
 **Only perform this step for Option 1 and Option 4.** Option 2 and Option 3 always preserve the worktree.
 
-```powershell
-$WORKTREE_PATH = git rev-parse --show-toplevel
+```bash
+WORKTREE_PATH=$(git rev-parse --show-toplevel)
 ```
 
 **If it is a standard Repo (`$GIT_DIR` matches `$GIT_COMMON`):** No extra worktree to clean up. Complete.
 
 **If the worktree path is within temporary management directories (`.worktrees/`, `worktrees/`):** We have ownership and proceed to clean up:
 
-```powershell
-$MAIN_ROOT = git rev-parse --show-toplevel
-cd $MAIN_ROOT
+```bash
+MAIN_ROOT=$(git rev-parse --show-toplevel)
+cd "$MAIN_ROOT"
 git worktree remove "$WORKTREE_PATH"
 git worktree prune  # Thoroughly clean up orphaned registrations
 ```

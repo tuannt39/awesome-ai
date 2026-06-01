@@ -64,20 +64,20 @@ rules/
 
 ```bash
 # 创建目标目录
-mkdir -p ~/.gemini/antigravity-cli/rules
+mkdir -p ~/.gemini/antigravity/rules
 
 # 安装通用规则（所有项目必需）
-cp -r rules/common ~/.gemini/antigravity-cli/rules/common
+cp -r rules/common ~/.gemini/antigravity/rules/common
 
 # 安装中文翻译版本（可选）
-cp -r rules/zh ~/.gemini/antigravity-cli/rules/zh
+cp -r rules/zh ~/.gemini/antigravity/rules/zh
 
 # 根据项目技术栈安装语言特定规则
-cp -r rules/typescript ~/.gemini/antigravity-cli/rules/typescript
-cp -r rules/python ~/.gemini/antigravity-cli/rules/python
-cp -r rules/golang ~/.gemini/antigravity-cli/rules/golang
-cp -r rules/swift ~/.gemini/antigravity-cli/rules/swift
-cp -r rules/php ~/.gemini/antigravity-cli/rules/php
+cp -r rules/typescript ~/.gemini/antigravity/rules/typescript
+cp -r rules/python ~/.gemini/antigravity/rules/python
+cp -r rules/golang ~/.gemini/antigravity/rules/golang
+cp -r rules/swift ~/.gemini/antigravity/rules/swift
+cp -r rules/php ~/.gemini/antigravity/rules/php
 ```
 
 ## 规则 vs 技能

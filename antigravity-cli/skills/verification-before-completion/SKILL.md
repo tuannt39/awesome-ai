@@ -71,14 +71,14 @@ Skipping any step = guessing, not verifying
 | "Subagent reported success" | You must check independently and cross-reference the Git diff. |
 | "I am tired" | Fatigue is not an excuse to lower the quality of work. |
 
-## Practical Verification Commands on Windows (PowerShell)
+## Practical Verification Commands
 
 ### Verification quality WITHOUT writing new tests:
 > [!IMPORTANT]
 > According to the strict policy of `GEMINI.md`, if the user does not request writing new tests, the AI absolutely must not write extra tests for verification. Instead, prioritize the following safe static and dynamic verification methods:
 
 **1. Compilation and System Build:**
-```powershell
+```bash
 # Run project build
 npm run build
 # Or for .NET / Go / Rust projects
@@ -89,14 +89,14 @@ cargo build
 *Ensure compilation finishes with exit code 0 and no critical errors.*
 
 **2. Type Checking:**
-```powershell
+```bash
 # Check TypeScript
 npx tsc --noEmit
 ```
 *Ensure no type errors are introduced.*
 
 **3. Syntax and Code Quality Linting:**
-```powershell
+```bash
 # Run linter
 npm run lint
 # Or run specific linter
@@ -105,16 +105,16 @@ npx eslint . --max-warnings 0
 *Require 0 errors and 0 warnings.*
 
 **4. Manual Execution and Logs Checking:**
-```powershell
+```bash
 # Run the application or CLI command to check actual results
 node dist/index.js --help
-# Check the latest log file generated on Windows
-Get-Content -Path .\logs\app.log -Tail 50
+# Check the latest log file
+tail -n 50 ./logs/app.log
 ```
 *Observe real logs to ensure no hidden warnings or exceptions.*
 
 **5. Check Actual Git Changes (Git Diff):**
-```powershell
+```bash
 # Compare actual changes
 git diff
 # Check list of changed files

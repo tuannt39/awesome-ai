@@ -28,7 +28,7 @@
 - **Default Skill**: `subagent-driven-development`.
 - **Parallelization**: Prefer batch-parallel execution if logic and state are independent. Otherwise, execute sequentially.
 - **Subagent Discovery**: 
-  - Call `list_dir` on `.gemini/antigravity-cli/agents` to find agents.
+  - Call `list_dir` on `.gemini/antigravity/agents` to find agents.
   - Before calling `define_subagent`, check if a `<name>.md` file exists here. If found, parse its `description` and `tools` (to enable write/subagent/mcp tools), then invoke it. 
   - If no agent exists, ask the user to create a new definition file or proceed with a temporary one.
 - Subagents must have a single objective and strictly follow the no-test-writing policy.
@@ -50,7 +50,7 @@
   3. A mandatory test statement (if none were requested): *"Không viết test mới vì người dùng không yêu cầu."* (Recommendations for missing tests belong here as optional follow-ups only).
 
 ## 8. Rules System
-- **Rules Directory**: `~/.gemini/antigravity-cli/rules/` contains coding guidelines structured hierarchically:
+- **Rules Directory**: `~/.gemini/antigravity/rules/` contains coding guidelines structured hierarchically:
   - `rules/common/` — common rules applicable to ALL languages (coding-style, patterns, security, hooks, testing, code-review, git-workflow, agents, performance, development-workflow)
   - `rules/<language>/` — language-specific rules (typescript, python, dart, golang, java, kotlin, rust, swift, ruby, php, csharp, fsharp, cpp, perl, angular, arkts)
   - `rules/web/` — web/frontend-specific rules (design-quality, performance, security, coding-style, patterns, hooks, testing)

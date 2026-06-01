@@ -10,7 +10,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.gemini/antigravity-cli/settings.json`:
+Configure in `~/.gemini/antigravity/settings.json`:
 
 - **dart format**: Auto-format `.dart` files after edit
 - **dart analyze**: Run static analysis after editing Dart files and surface warnings

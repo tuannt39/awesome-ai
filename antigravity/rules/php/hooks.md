@@ -12,7 +12,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.gemini/antigravity-cli/settings.json`:
+Configure in `~/.gemini/antigravity/settings.json`:
 
 - **Pint / PHP-CS-Fixer**: Auto-format edited `.php` files.
 - **PHPStan / Psalm**: Run static analysis after PHP edits in typed codebases.

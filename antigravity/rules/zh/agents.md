@@ -2,7 +2,7 @@
 
 ## 可用代理
 
-位于 `~/.gemini/antigravity-cli/agents/`：
+位于 `~/.gemini/antigravity/agents/`：
 
 | 代理 | 用途 | 何时使用 |
 |-------|---------|------------|

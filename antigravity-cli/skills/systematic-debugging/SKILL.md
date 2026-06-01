@@ -87,19 +87,19 @@ You MUST complete each phase before moving to the next.
    THEN investigate that specific component in detail
    ```
 
-   **Example on Windows PowerShell (Multi-layered System):**
-   ```powershell
+   **Example (Multi-layered System):**
+   ```bash
    # Layer 1: Check environment variables in current session
-   Write-Host "=== Secrets available in workflow ==="
-   if ($env:IDENTITY) { Write-Host "IDENTITY: SET" } else { Write-Host "IDENTITY: NOT SET" }
+   echo "=== Secrets available in workflow ==="
+   if [ -n "$IDENTITY" ]; then echo "IDENTITY: SET"; else echo "IDENTITY: NOT SET"; fi
 
    # Layer 2: Check inside build script
-   Write-Host "=== Environment variables in build script ==="
-   Get-ChildItem env: | Where-Object { $_.Name -like "*IDENTITY*" }
+   echo "=== Environment variables in build script ==="
+   env | grep IDENTITY
 
-   # Layer 3: Code signing certificate status on Windows
-   Write-Host "=== Certificate status on Windows ==="
-   Get-ChildItem Cert:\CurrentUser\My
+   # Layer 3: Check certificate/key files
+   echo "=== Certificate/key files ==="
+   ls -la ~/.ssh/ 2>/dev/null; ls -la /etc/ssl/certs/ 2>/dev/null | head -5
    ```
 
    **This reveals:** Which layer is failing (secret -> workflow ✓, workflow -> build ✗).

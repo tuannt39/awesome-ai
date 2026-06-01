@@ -9,7 +9,7 @@
 
 Types: feat, fix, refactor, docs, test, chore, perf, ci
 
-Note: Attribution disabled globally via ~/.gemini/antigravity-cli/settings.json.
+Note: Attribution disabled globally via ~/.gemini/antigravity/settings.json.
 
 ## Pull Request Workflow
 

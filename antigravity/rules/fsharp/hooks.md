@@ -14,7 +14,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.gemini/antigravity-cli/settings.json`:
+Configure in `~/.gemini/antigravity/settings.json`:
 
 - **fantomas**: Auto-format edited F# files
 - **dotnet build**: Verify the solution or project still compiles after edits

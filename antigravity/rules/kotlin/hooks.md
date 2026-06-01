@@ -10,7 +10,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.gemini/antigravity-cli/settings.json`:
+Configure in `~/.gemini/antigravity/settings.json`:
 
 - **ktfmt/ktlint**: Auto-format `.kt` and `.kts` files after edit
 - **detekt**: Run static analysis after editing Kotlin files

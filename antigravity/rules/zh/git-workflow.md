@@ -9,7 +9,7 @@
 
 类型：feat, fix, refactor, docs, test, chore, perf, ci
 
-注意：通过 ~/.gemini/antigravity-cli/settings.json 全局禁用归属。
+注意：通过 ~/.gemini/antigravity/settings.json 全局禁用归属。
 
 ## Pull Request 工作流
 

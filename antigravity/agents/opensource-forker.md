@@ -46,7 +46,7 @@ find SOURCE_DIR -type f | grep -v node_modules | grep -v .git | grep -v __pycach
 mkdir -p TARGET_DIR
 rsync -av --exclude='.git' --exclude='node_modules' --exclude='__pycache__' \
   --exclude='.env*' --exclude='*.pyc' --exclude='.venv' --exclude='venv' \
-  --exclude='.gemini/antigravity-cli/' --exclude='.secrets/' --exclude='secrets/' \
+  --exclude='.gemini/antigravity/' --exclude='.secrets/' --exclude='secrets/' \
   SOURCE_DIR/ TARGET_DIR/
 ```
 
@@ -95,7 +95,7 @@ key-[A-Za-z0-9]{32}
 - `*.pem`, `*.key`, `*.p12`, `*.pfx` (private keys)
 - `credentials.json`, `service-account.json`
 - `.secrets/`, `secrets/`
-- `.gemini/antigravity-cli/settings.json`
+- `.gemini/antigravity/settings.json`
 - `sessions/`
 - `*.map` (source maps expose original source structure and file paths)
 

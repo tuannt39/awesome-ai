@@ -2,7 +2,7 @@
 
 ## Available Agents
 
-Located in `~/.gemini/antigravity-cli/agents/`:
+Located in `~/.gemini/antigravity/agents/`:
 
 | Agent | Purpose | When to Use |
 |-------|---------|-------------|

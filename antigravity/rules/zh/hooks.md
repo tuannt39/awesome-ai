@@ -12,7 +12,7 @@
 - 为可信、定义明确的计划启用
 - 探索性工作时禁用
 - 永远不要使用 dangerously-skip-permissions 标志
-- 改为在 `~/.gemini/antigravity-cli/settings.json` 中配置 `allowedTools`
+- 改为在 `~/.gemini/antigravity/settings.json` 中配置 `allowedTools`
 
 ## artifact task.md 最佳实践
 

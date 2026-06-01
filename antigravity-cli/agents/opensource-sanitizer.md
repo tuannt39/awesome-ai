@@ -94,6 +94,7 @@ severity: CRITICAL
 pattern: /home/[a-z][a-z0-9_-]*/  (anything other than /home/user/)
 pattern: /Users/[A-Za-z][A-Za-z0-9_-]*/  (macOS home directories)
 pattern: C:\\Users\\[A-Za-z]  (Windows home directories)
+pattern: /home/[a-z] (Linux home directories)
 severity: CRITICAL
 
 # Internal secret file references

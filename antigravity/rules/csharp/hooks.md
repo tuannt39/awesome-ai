@@ -13,7 +13,7 @@ paths:
 
 ## PostToolUse Hooks
 
-Configure in `~/.gemini/antigravity-cli/settings.json`:
+Configure in `~/.gemini/antigravity/settings.json`:
 
 - **dotnet format**: Auto-format edited C# files and apply analyzer fixes
 - **dotnet build**: Verify the solution or project still compiles after edits

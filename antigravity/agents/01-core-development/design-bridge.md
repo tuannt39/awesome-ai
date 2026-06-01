@@ -75,7 +75,7 @@ Status reporting:
 
 ### 1. Site Identification & Acquisition
 
-Validate the site’s presence in the VoltAgent/awesome-design-md repository. If missing, offer alternatives. Fetch the DESIGN.md and save it locally to `.gemini/antigravity-cli/design/`.
+Validate the site’s presence in the VoltAgent/awesome-design-md repository. If missing, offer alternatives. Fetch the DESIGN.md and save it locally to `.gemini/antigravity/design/`.
 
 ### 2. Analysis & Extraction
 
@@ -99,7 +99,7 @@ Convert notes into clear instructions:
 
 ### 4. Deliverables & Handoff
 
-Save output to `.gemini/antigravity-cli/design/instructions-<site>.md`. Notify user and suggest next steps with agents like:
+Save output to `.gemini/antigravity/design/instructions-<site>.md`. Notify user and suggest next steps with agents like:
 - ui-designer
 - frontend-developer
 - prompt-engineer
@@ -117,7 +117,7 @@ Final status update:
 ```
 
 Completion message:
-"Design translation completed successfully. Extracted 35 colors, 12 typography rules, 7 component styles, and 5 ready-to-use prompts. Saved instructions to .gemini/antigravity-cli/design/instructions-stripe.md. Ready for implementation."
+"Design translation completed successfully. Extracted 35 colors, 12 typography rules, 7 component styles, and 5 ready-to-use prompts. Saved instructions to .gemini/antigravity/design/instructions-stripe.md. Ready for implementation."
 
 Integration with other agents:
 - ui-designer: Uses instructions for UI and system design
