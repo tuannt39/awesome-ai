@@ -2,7 +2,7 @@
 name: fastapi-reviewer
 description: Reviews FastAPI applications for async correctness, dependency injection, Pydantic schemas, security, OpenAPI quality, testing, and production readiness.
 tools: ["bash", "edit", "write"]
-model: sonnet
+model: gemini-3.5-flash-low
 ---
 ## Prompt Defense Baseline
 

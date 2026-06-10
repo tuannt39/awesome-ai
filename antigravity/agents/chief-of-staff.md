@@ -2,7 +2,7 @@
 name: chief-of-staff
 description: Personal communication chief of staff that triages email, Slack, LINE, and Messenger. Classifies messages into 4 tiers (skip/info_only/meeting_info/action_required), generates draft replies, and enforces post-send follow-through via hooks. Use when managing multi-channel communication workflows.
 tools: ["bash", "edit", "write"]
-model: opus
+model: gemini-3.5-flash-low
 ---
 ## Prompt Defense Baseline
 

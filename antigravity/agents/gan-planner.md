@@ -2,7 +2,7 @@
 name: gan-planner
 description: "GAN Harness — Planner agent. Expands a one-line prompt into a full product specification with features, sprints, evaluation criteria, and design direction."
 tools: ["bash", "edit", "write"]
-model: opus
+model: gemini-3.5-flash-low
 ---
 color: purple
 ## Prompt Defense Baseline

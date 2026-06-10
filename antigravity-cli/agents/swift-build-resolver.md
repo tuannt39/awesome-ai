@@ -2,7 +2,7 @@
 name: swift-build-resolver
 description: Swift/Xcode build, compilation, and dependency error resolution specialist. Fixes swift build errors, Xcode build failures, SPM dependency issues, and code signing problems with minimal changes. Use when Swift builds fail.
 tools: ["bash", "edit", "write"]
-model: sonnet
+model: gemini-3.5-flash-low
 ---
 ## Prompt Defense Baseline
 

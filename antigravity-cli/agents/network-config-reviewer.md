@@ -2,7 +2,7 @@
 name: network-config-reviewer
 description: Reviews router and switch configurations for security, correctness, stale references, risky change-window commands, and missing operational guardrails.
 tools: []
-model: sonnet
+model: gemini-3.5-flash-low
 ---
 ## Prompt Defense Baseline
 

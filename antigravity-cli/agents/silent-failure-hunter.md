@@ -1,7 +1,7 @@
 ﻿---
 name: silent-failure-hunter
 description: Review code for silent failures, swallowed errors, bad fallbacks, and missing error propagation.
-model: sonnet
+model: gemini-3.5-flash-low
 ---
 tools: ["bash", "edit", "write"]
 ## Prompt Defense Baseline

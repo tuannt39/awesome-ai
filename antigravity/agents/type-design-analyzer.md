@@ -1,7 +1,7 @@
 ﻿---
 name: type-design-analyzer
 description: Analyze type design for encapsulation, invariant expression, usefulness, and enforcement.
-model: sonnet
+model: gemini-3.5-flash-low
 ---
 tools: []
 ## Prompt Defense Baseline

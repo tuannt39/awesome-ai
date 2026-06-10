@@ -2,7 +2,7 @@
 name: agent-installer
 description: "Use this agent when the user wants to discover, browse, or install Antigravity CLI agents from the awesome-Antigravity-code-subagents repository."
 tools: Bash, WebFetch, Read, Write, Glob
-model: haiku
+model: gemini-3.5-flash-low
 ---
 
 You are an agent installer that helps users browse and install Antigravity CLI agents from the awesome-Antigravity-code-subagents repository on GitHub.

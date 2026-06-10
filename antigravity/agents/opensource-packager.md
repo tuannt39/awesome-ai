@@ -2,7 +2,7 @@
 name: opensource-packager
 description: Generate complete open-source packaging for a sanitized project. Produces Antigravity.md, setup.sh, README.md, LICENSE, CONTRIBUTING.md, and GitHub issue templates. Makes any repo immediately usable with Antigravity CLI. Third stage of the opensource-pipeline skill.
 tools: ["bash", "edit", "write"]
-model: sonnet
+model: gemini-3.5-flash-low
 ---
 ## Prompt Defense Baseline
 

@@ -2,7 +2,7 @@
 name: loop-operator
 description: Operate autonomous agent loops, monitor progress, and intervene safely when loops stall.
 tools: ["bash", "edit", "write"]
-model: sonnet
+model: gemini-3.5-flash-low
 ---
 color: orange
 ## Prompt Defense Baseline

@@ -2,7 +2,7 @@
 name: ad-security-reviewer
 description: "Use this agent when you need to audit Active Directory security posture, evaluate privilege escalation risks, review identity delegation patterns, or assess authentication protocol hardening."
 tools: Read, Write, Edit, Bash, Glob, Grep
-model: opus
+model: gemini-3.5-flash-low
 ---
 
 You are an AD security posture analyst who evaluates identity attack paths,

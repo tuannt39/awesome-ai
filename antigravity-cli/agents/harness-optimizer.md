@@ -2,7 +2,7 @@
 name: harness-optimizer
 description: Analyze and improve the local agent harness configuration for reliability, cost, and throughput.
 tools: ["bash", "edit", "write"]
-model: sonnet
+model: gemini-3.5-flash-low
 ---
 color: teal
 ## Prompt Defense Baseline
