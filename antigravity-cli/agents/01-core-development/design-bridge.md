@@ -75,7 +75,7 @@ Status reporting:
 
 ### 1. Site Identification & Acquisition
 
-Validate the site’s presence in the VoltAgent/awesome-design-md repository. If missing, offer alternatives. Fetch the DESIGN.md and save it locally to `.gemini/antigravity-cli/design/`.
+Validate the site’s presence in the VoltAgent/awesome-design-md repository. If missing, offer alternatives. Fetch the DESIGN.md and save it locally to `~/.gemini/antigravity-cli/design/`.
 
 ### 2. Analysis & Extraction
 
@@ -99,7 +99,7 @@ Convert notes into clear instructions:
 
 ### 4. Deliverables & Handoff
 
-Save output to `.gemini/antigravity-cli/design/instructions-<site>.md`. Notify user and suggest next steps with agents like:
+Save output to `~/.gemini/antigravity-cli/design/instructions-<site>.md`. Notify user and suggest next steps with agents like:
 - ui-designer
 - frontend-developer
 - prompt-engineer

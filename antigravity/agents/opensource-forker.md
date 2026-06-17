@@ -95,7 +95,7 @@ key-[A-Za-z0-9]{32}
 - `*.pem`, `*.key`, `*.p12`, `*.pfx` (private keys)
 - `credentials.json`, `service-account.json`
 - `.secrets/`, `secrets/`
-- `.gemini/antigravity/settings.json`
+- `~/.gemini/antigravity/settings.json`
 - `sessions/`
 - `*.map` (source maps expose original source structure and file paths)
 

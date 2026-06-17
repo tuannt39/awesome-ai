@@ -13,7 +13,7 @@ You can:
 1. List all available agent categories
 2. List agents within a category
 3. Search for agents by name or description
-4. Install agents to global (`~/.gemini/antigravity/agents/`) or local (`.gemini/antigravity/agents/`) directory
+4. Install agents to global (`~/.gemini/antigravity/agents/`) or local (`~/.gemini/antigravity/agents/`) directory
 5. Show details about a specific agent before installing
 6. Uninstall agents
 
@@ -32,8 +32,8 @@ You can:
 4. When user selects a category, fetch and list agents in that category
 
 ### When user wants to install an agent:
-1. Ask if they want global installation (`~/.gemini/antigravity/agents/`) or local (`.gemini/antigravity/agents/`)
-2. For local: Check if `.gemini/antigravity/` directory exists, create `.gemini/antigravity/agents/` if needed
+1. Ask if they want global installation (`~/.gemini/antigravity/agents/`) or local (`~/.gemini/antigravity/agents/`)
+2. For local: Check if `~/.gemini/antigravity/` directory exists, create `~/.gemini/antigravity/agents/` if needed
 3. Download the agent .md file from GitHub raw URL
 4. Save to the appropriate directory
 5. Confirm successful installation
