@@ -1,0 +1,25 @@
+{
+  "allowNonWorkspaceAccess": true,
+  "artifactReviewPolicy": "always-proceed",
+  "colorScheme": "dark",
+  "editor": "notepad",
+  "model": "Gemini 3.5 Flash (Low)",
+  "permissions": {
+    "allow": [
+      "command(*)",
+      "read_file(*)",
+      "write_file(*)",
+      "read_url(*)",
+      "execute_url(*)",
+      "unsandboxed(*)",
+      "mcp(*)"
+    ]
+  },
+  "toolPermission": "always-proceed",
+  "trustedWorkspaces": [
+    "/home/tuannt/Documents/pd/pandas-ai-service",
+    "/home/tuannt/Documents/me/chat-omni-ai-auto-test",
+    "/home/tuannt/.gemini",
+    "/home/tuannt/Documents/pd/gelex-wiki"
+  ]
+}
