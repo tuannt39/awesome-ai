@@ -52,7 +52,7 @@ When starting an Antigravity CLI session, the agent MUST perform the following s
 
 ## 4. Execution Model & Subagents
 - **Default Skill**: `subagent-driven-development`.
-- **Parallelization**: Prefer batch-parallel execution if logic and state are independent. Otherwise, execute sequentially.
+- **Parallelization (Mandatory minimum)**: For any task that can be decomposed into independent work, you MUST split it into AT LEAST 3 independent tasks and dispatch AT LEAST 3 subagents in parallel (batch-parallel) in a single batch — provided BOTH logic and state are independent. Fall back to fewer subagents or sequential execution ONLY when: (a) fewer than 3 genuinely independent tasks exist, or (b) tasks share state, have dependencies, or risk merge conflicts (per Section 5 state-isolation). Whenever you cannot reach 3 parallel subagents, state explicitly WHY before proceeding.
 - **Subagent Discovery** (already scanned during Bootstrap — Section 0):
   - Look up agent definitions in order: **project-level** (`<project-root>/antigravity-cli/agents/`) → **global-level** (`~/.gemini/antigravity-cli/agents/`).
   - Before calling `define_subagent`, check if a `<name>.md` file exists in either directory. If found, parse its `description` and `tools` (to enable write/subagent/mcp tools), then invoke it.
