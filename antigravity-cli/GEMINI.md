@@ -5,11 +5,9 @@ When starting an Antigravity CLI session, the agent MUST perform the following s
 
 1. **Load `using-superpowers` skill**: Read the `SKILL.md` of the `using-superpowers` skill (with `IsSkillFile: true`) to activate the skill-first workflow. This is MANDATORY for EVERY conversation — no exceptions.
 2. **Discovery Agents**: Scan agent directories in priority order:
-   - **Project-level** (high priority): `<project-root>/antigravity-cli/agents/` — project-specific agents
    - **Global-level** (fallback): `~/.gemini/antigravity-cli/agents/` — shared agents across all projects
    - Cache the list of available agents for use with `define_subagent` / `invoke_subagent` as needed.
 3. **Discovery Rules**: Scan rule directories in priority order:
-   - **Project-level** (high priority): `<project-root>/antigravity-cli/rules/` — project-specific rules
    - **Global-level** (fallback): `~/.gemini/antigravity-cli/rules/` — shared rules across all projects
    - Cache the directory structure (common, language-specific, web) for quick lookup when processing code.
 4. **Precedence**: Project-level overrides Global-level when conflicts arise (same agent or rule file name).
@@ -54,7 +52,7 @@ When starting an Antigravity CLI session, the agent MUST perform the following s
 - **Default Skill**: `subagent-driven-development`.
 - **Parallelization (Mandatory minimum)**: For any task that can be decomposed into independent work, you MUST split it into AT LEAST 3 independent tasks and dispatch AT LEAST 3 subagents in parallel (batch-parallel) in a single batch — provided BOTH logic and state are independent. Fall back to fewer subagents or sequential execution ONLY when: (a) fewer than 3 genuinely independent tasks exist, or (b) tasks share state, have dependencies, or risk merge conflicts (per Section 5 state-isolation). Whenever you cannot reach 3 parallel subagents, state explicitly WHY before proceeding.
 - **Subagent Discovery** (already scanned during Bootstrap — Section 0):
-  - Look up agent definitions in order: **project-level** (`<project-root>/antigravity-cli/agents/`) → **global-level** (`~/.gemini/antigravity-cli/agents/`).
+  - Look up agent definitions in order: **global-level** (`~/.gemini/antigravity-cli/agents/`).
   - Before calling `define_subagent`, check if a `<name>.md` file exists in either directory. If found, parse its `description` and `tools` (to enable write/subagent/mcp tools), then invoke it.
   - Project-level agent overrides global-level agent with the same name.
   - If no agent exists, ask the user to create a new definition file or proceed with a temporary one.
