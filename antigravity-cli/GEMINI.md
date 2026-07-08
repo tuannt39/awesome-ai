@@ -32,16 +32,16 @@ When starting an Antigravity CLI session, the agent MUST perform the following s
 ## 2. Planning & Execution Workflow
 - ALWAYS use the `using-superpowers` skill for EVERY task (trivial or non-trivial). This skill is already loaded during Bootstrap (Section 0). Do NOT use the default `/planning` mode.
 - **The 5-Step Workflow (Brainstorm -> Approve Spec -> Write Plan -> Approve Plan -> Auto-Execute):**
-  1. **Brainstorm/Spec**: Use the `brainstorming` skill to analyze requirements, design a solution. You MUST perform **Dual-Write Sync**: write the Spec file to the project directory (e.g., `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` with `IsArtifact: false`) and simultaneously save a copy to the Brain directory (e.g., `<artifactDir>/analysis_results.md` with `IsArtifact: true` and `ArtifactMetadata` of type `other`).
+  1. **Brainstorm/Spec**: Use the `brainstorming` skill to analyze requirements, design a solution. Save the Spec file directly to the Brain directory (e.g., `<artifactDir>/YYYY-MM-DD-<topic>-analysis_results.md` with `IsArtifact: true` and `ArtifactMetadata` of type `other`).
   2. **Mandatory Pause 1 (Approve Spec) - HARD GATE**: After presenting the brainstorm/spec, you MUST call the `ask_question` tool to ask the user to approve the Spec (e.g., question: "Approve the Spec to continue?", options: ["Approve Spec and proceed to Plan", "Needs adjustments"]), and output the phrase:
      *"⏸️ **Awaiting Spec approval** — Please respond to the dialog to continue."*
      Then IMMEDIATELY STOP ALL TOOL CALLS. Do not call any tool (including `writing-plans`) until the user explicitly responds with approval.
-  3. **Write Plan**: Upon receiving approval for the Spec, AUTOMATICALLY run the `writing-plans` skill to generate a detailed implementation plan. You MUST perform **Dual-Write Sync**: write the Plan file to the project directory (e.g., `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md` with `IsArtifact: false`) and simultaneously save a copy to the Brain directory (e.g., `<artifactDir>/implementation_plan.md` with `IsArtifact: true` and `ArtifactMetadata` of type `implementation_plan`).
+  3. **Write Plan**: Upon receiving approval for the Spec, AUTOMATICALLY run the `writing-plans` skill to generate a detailed implementation plan. Save the Plan file directly to the Brain directory (e.g., `<artifactDir>/YYYY-MM-DD-<feature-name>-implementation_plan.md` with `IsArtifact: true` and `ArtifactMetadata` of type `implementation_plan`). Plans MUST include a `## Global Constraints` block (project-wide requirements verbatim from spec) and each task MUST include an `**Interfaces:**` block (Consumes/Produces with exact signatures) per `writing-plans` skill v6.0.0+.
   4. **Mandatory Pause 2 (Approve Plan) - HARD GATE**: After writing the implementation plan, you MUST call the `ask_question` tool to ask the user to approve the Plan (e.g., question: "Approve the Plan to continue?", options: ["Approve Plan and execute", "Needs adjustments"]), and output the phrase:
      *"⏸️ **Awaiting Plan approval** — Please respond to the dialog to continue."*
      Then IMMEDIATELY STOP ALL TOOL CALLS. Do not call any tool or transition to execution until the user explicitly responds with approval.
-  5. **Auto Execution**: Upon receiving approval for the Plan, AUTOMATICALLY transition directly into `subagent-driven-development` for implementation. DO NOT ask the user to choose an execution mode.
-- *Note*: If tests are not requested, plans must explicitly state: *"No new tests will be written; verification will use non-test methods or run existing tests where appropriate."*
+  5. **Auto Execution**: Upon receiving approval for the Plan, AUTOMATICALLY transition directly into `subagent-driven-development` for implementation. DO NOT ask the user to choose an execution mode. Execution is **continuous** — do NOT pause between tasks to check in; execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status that cannot be resolved, ambiguity that genuinely prevents progress, or all tasks complete.
+- *Note*: If tests are not requested, plans must explicitly state: *"No new tests will be written; verification will use non-test methods or run existing tests where appropriate."* Plan steps involving TDD (`Write the failing test`, `Run test to verify`) MUST be replaced with equivalent non-test verification steps (e.g., build check, typecheck, lint, manual inspection).
 
 ## 3. Strict Test-Writing Policy
 - **Default Rule**: Do NOT write, create, or modify test code (fixtures, mocks, etc.). "Verify", "check", or "evidence" do not grant permission to write tests.
@@ -57,6 +57,13 @@ When starting an Antigravity CLI session, the agent MUST perform the following s
   - Project-level agent overrides global-level agent with the same name.
   - If no agent exists, ask the user to create a new definition file or proceed with a temporary one.
 - Subagents must have a single objective and strictly follow the no-test-writing policy.
+- **SDD Workflow (v6.0.0+)**:
+  - **Pre-flight plan review**: Before dispatching Task 1, scan the plan for contradictions, conflicts with Global Constraints, or ambiguities. Present all findings as one batched question — not one interrupt per discovery.
+  - **File handoffs**: Use `scripts/task-brief` and `scripts/review-package` for artifact transfer between subagents. Do NOT paste large artifacts into dispatch prompts — hand artifacts as file paths instead.
+  - **Implementer status handling**: Handle DONE (proceed to review), DONE_WITH_CONCERNS (assess then review), NEEDS_CONTEXT (provide and re-dispatch), BLOCKED (escalate or re-dispatch with more capable model).
+  - **Durable progress**: Track progress in a ledger file at `.superpowers/sdd/progress.md`. Adapt ledger for no-git environment: record task completion with timestamps and file-based diff references instead of commit SHAs (e.g., `Task N: complete (2024-01-15T10:30, files: a.ts, b.ts, review clean)`).
+- **Antigravity Task Tracking**: Antigravity CLI has NO todo tool (`manage_task` manages background processes only). When skills say "create a todo", maintain a **task artifact**: markdown checklist saved with `write_to_file` (`IsArtifact: true`, `ArtifactType: "task"`), edited with `replace_file_content` / `multi_replace_file_content` as tasks progress.
+- **Model Selection (SDD)**: Always specify model explicitly when dispatching subagents. Mechanical tasks (1-2 files, clear spec) → cheap model. Integration/judgment tasks (multi-file, debugging) → standard model. Architecture/design tasks and final whole-branch review → most capable model. Turn count beats token price — cheapest models often take 2-3× turns on multi-step work, costing more overall.
 
 ## 5. Scope & Destructive Operations
 - **State Isolation**: Treat session data as scope-bound. Verify state isolation before parallel execution.
@@ -68,7 +75,7 @@ When starting an Antigravity CLI session, the agent MUST perform the following s
 - **Refactoring**: Must preserve external behavior. Never mix refactor and feature work.
 
 ## 7. Definition of Done & Final Report
-- **Done Criteria**: Scope addressed, changes verified with evidence, no unauthorized tests created, risks highlighted.
+- **Done Criteria**: Scope addressed, changes verified with evidence, no unauthorized tests created, risks highlighted. MUST invoke `verification-before-completion` skill before any completion claim — no shortcuts, run the command, read the output, THEN claim the result.
 - **Final Report Requirements**:
   1. Summary of modified files.
   2. Verification commands run and their exact results.
