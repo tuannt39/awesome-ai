@@ -18,6 +18,7 @@ When starting an Antigravity CLI session, the agent MUST perform the following s
 - **Language**: Vietnamese (for all responses, plans, updates, and reports). Use clear, concise, evidence-based wording.
 - **Approach**: Fix root causes with simple, small, verifiable changes. Do not expand scope. 
 - **Workspace**: Work in the current working directory. No git commits, git worktrees, or isolated workspaces unless explicitly requested.
+- **Slash Commands**: When context is appropriate, recommend user slash commands: `/goal` (long-running tasks, overnight), `/learn` (persist new behavior), `/schedule` (recurring tasks), `/grill-me` (interactive planning alignment). Do NOT execute slash commands — only recommend.
 - **Universal Git Restriction — ALL agents, skills, and plugins**: The "no git commits, git worktrees" rule above applies universally to EVERY agent, skill, plugin, subagent, and prompt template loaded in this session. No component may override, bypass, or implicitly assume permission for any of the following actions unless the user has **explicitly requested** them in the current conversation:
   - `git commit`, `git add` — Do not commit or stage changes. Save files only.
   - `git worktree` — Do not create, remove, or manage worktrees.
@@ -32,11 +33,11 @@ When starting an Antigravity CLI session, the agent MUST perform the following s
 ## 2. Planning & Execution Workflow
 - ALWAYS use the `using-superpowers` skill for EVERY task (trivial or non-trivial). This skill is already loaded during Bootstrap (Section 0). Do NOT use the default `/planning` mode.
 - **The 5-Step Workflow (Brainstorm -> Approve Spec -> Write Plan -> Approve Plan -> Auto-Execute):**
-  1. **Brainstorm/Spec**: Use the `brainstorming` skill to analyze requirements, design a solution. Save the Spec file directly to the Brain directory (e.g., `<artifactDir>/YYYY-MM-DD-<topic>-analysis_results.md` with `IsArtifact: true` and `ArtifactMetadata` of type `other`).
+  1. **Brainstorm/Spec**: Use the `brainstorming` skill to analyze requirements, design a solution. Save the Spec file directly to the Brain directory (e.g., `<artifactDir>/YYYY-MM-DD-<topic>-analysis_results.md`) with `ArtifactMetadata: { Summary: "Spec analysis for <topic>", UserFacing: true, RequestFeedback: true }`.
   2. **Mandatory Pause 1 (Approve Spec) - HARD GATE**: After presenting the brainstorm/spec, you MUST call the `ask_question` tool to ask the user to approve the Spec (e.g., question: "Approve the Spec to continue?", options: ["Approve Spec and proceed to Plan", "Needs adjustments"]), and output the phrase:
      *"⏸️ **Awaiting Spec approval** — Please respond to the dialog to continue."*
      Then IMMEDIATELY STOP ALL TOOL CALLS. Do not call any tool (including `writing-plans`) until the user explicitly responds with approval.
-  3. **Write Plan**: Upon receiving approval for the Spec, AUTOMATICALLY run the `writing-plans` skill to generate a detailed implementation plan. Save the Plan file directly to the Brain directory (e.g., `<artifactDir>/YYYY-MM-DD-<feature-name>-implementation_plan.md` with `IsArtifact: true` and `ArtifactMetadata` of type `implementation_plan`). Plans MUST include a `## Global Constraints` block (project-wide requirements verbatim from spec) and each task MUST include an `**Interfaces:**` block (Consumes/Produces with exact signatures) per `writing-plans` skill v6.0.0+.
+  3. **Write Plan**: Upon receiving approval for the Spec, AUTOMATICALLY run the `writing-plans` skill to generate a detailed implementation plan. Save the Plan file directly to the Brain directory (e.g., `<artifactDir>/YYYY-MM-DD-<feature-name>-implementation_plan.md`) with `ArtifactMetadata: { Summary: "Implementation plan for <feature-name>", UserFacing: true, RequestFeedback: true }`. Plans MUST include a `## Global Constraints` block (project-wide requirements verbatim from spec) and each task MUST include an `**Interfaces:**` block (Consumes/Produces with exact signatures) per `writing-plans` skill v6.0.0+.
   4. **Mandatory Pause 2 (Approve Plan) - HARD GATE**: After writing the implementation plan, you MUST call the `ask_question` tool to ask the user to approve the Plan (e.g., question: "Approve the Plan to continue?", options: ["Approve Plan and execute", "Needs adjustments"]), and output the phrase:
      *"⏸️ **Awaiting Plan approval** — Please respond to the dialog to continue."*
      Then IMMEDIATELY STOP ALL TOOL CALLS. Do not call any tool or transition to execution until the user explicitly responds with approval.
@@ -60,9 +61,10 @@ When starting an Antigravity CLI session, the agent MUST perform the following s
 - **SDD Workflow (v6.0.0+)**:
   - **Pre-flight plan review**: Before dispatching Task 1, scan the plan for contradictions, conflicts with Global Constraints, or ambiguities. Present all findings as one batched question — not one interrupt per discovery.
   - **File handoffs**: Use `scripts/task-brief` and `scripts/review-package` for artifact transfer between subagents. Do NOT paste large artifacts into dispatch prompts — hand artifacts as file paths instead.
+  - **No-git review alternative**: When `scripts/review-package` fails (no git history), use manual diff: `diff -ruN <before-snapshot> <after-snapshot> > .superpowers/sdd/<conversation-id-short>/task-N-diff.txt` and pass this file path to the task reviewer.
   - **Implementer status handling**: Handle DONE (proceed to review), DONE_WITH_CONCERNS (assess then review), NEEDS_CONTEXT (provide and re-dispatch), BLOCKED (escalate or re-dispatch with more capable model).
-  - **Durable progress**: Track progress in a ledger file at `.superpowers/sdd/progress.md`. Adapt ledger for no-git environment: record task completion with timestamps and file-based diff references instead of commit SHAs (e.g., `Task N: complete (2024-01-15T10:30, files: a.ts, b.ts, review clean)`).
-- **Antigravity Task Tracking**: Antigravity CLI has NO todo tool (`manage_task` manages background processes only). When skills say "create a todo", maintain a **task artifact**: markdown checklist saved with `write_to_file` (`IsArtifact: true`, `ArtifactType: "task"`), edited with `replace_file_content` / `multi_replace_file_content` as tasks progress.
+  - **Durable progress**: Track progress in a ledger file at `<projectRoot>/.superpowers/sdd/<conversation-id-short>/progress.md` (per SDD v6.0.3+, this directory is self-ignoring). Use the first 8 chars of the Conversation ID as `<conversation-id-short>` to namespace per-session, preventing collisions when multiple sessions run on the same repo. In no-git environment: use `pwd` instead of `git rev-parse --show-toplevel` to resolve project root; record task completion with timestamps and file paths instead of commit SHAs (e.g., `Task N: complete (2026-07-17T10:30, files: a.ts, b.ts, review clean)`).
+- **Antigravity Task Tracking**: Antigravity CLI has NO todo tool (`manage_task` manages background processes only). When skills say "create a todo", maintain a **task artifact**: markdown checklist saved with `write_to_file` and `ArtifactMetadata: { Summary: "Task checklist for <feature>", UserFacing: true, RequestFeedback: false }`, edited with `replace_file_content` / `multi_replace_file_content` as tasks progress.
 - **Model Selection (SDD)**: Always specify model explicitly when dispatching subagents. Mechanical tasks (1-2 files, clear spec) → cheap model. Integration/judgment tasks (multi-file, debugging) → standard model. Architecture/design tasks and final whole-branch review → most capable model. Turn count beats token price — cheapest models often take 2-3× turns on multi-step work, costing more overall.
 
 ## 5. Scope & Destructive Operations
@@ -76,6 +78,7 @@ When starting an Antigravity CLI session, the agent MUST perform the following s
 
 ## 7. Definition of Done & Final Report
 - **Done Criteria**: Scope addressed, changes verified with evidence, no unauthorized tests created, risks highlighted. MUST invoke `verification-before-completion` skill before any completion claim — no shortcuts, run the command, read the output, THEN claim the result.
+- **Artifact-based reporting**: Final report SHOULD be saved as an artifact with `ArtifactMetadata: { Summary: "Final report for <task>", UserFacing: true, RequestFeedback: false }` so user can review via Artifact Panel (`ctrl+r` or `/artifact`).
 - **Final Report Requirements**:
   1. Summary of modified files.
   2. Verification commands run and their exact results.
