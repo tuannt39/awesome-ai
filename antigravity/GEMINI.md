@@ -67,15 +67,18 @@ ALWAYS use the skill-first workflow for EVERY task. Do NOT use default planning 
    the user explicitly responds with approval.
 
 3. **Write Plan**: Upon receiving Spec approval, AUTOMATICALLY run the plan-writing skill to generate
-   a detailed implementation plan.
+   a detailed implementation plan artifact. Generating/writing the plan artifact MUST be the final tool action of that turn.
 
-4. **Hard Gate 2 (Approve Plan) — MANDATORY BLOCK**: After writing the plan, you MUST ask the user
-   to approve it, and output:
-   *"⏸️ **Awaiting Plan approval** — Please respond to continue."*
-   Then **IMMEDIATELY STOP ALL TOOL CALLS** until the user explicitly responds with approval.
+4. **Hard Gate 2 (Approve Plan) — MANDATORY HARD STOP**: After generating/writing the plan artifact, you MUST:
+   a. Ask the user to approve the plan and output:
+      *"⏸️ **Awaiting Plan approval** — Please respond to continue."*
+   b. **IMMEDIATELY STOP ALL TOOL CALLS** and end the current turn.
+   c. **NO TOOL CHAINING**: You MUST NOT include any code-editing (`replace_file_content`, `multi_replace_file_content`, non-plan `write_to_file`), command execution (`run_command`), or subagent (`invoke_subagent`) tool calls in the same turn as plan artifact generation, nor in subsequent turns until receiving explicit user approval in chat.
+   d. **Slash Command `/plan` Handling**: When processing a `/plan` request, your task ends upon writing the plan artifact and stopping. You MUST NOT proceed to code execution in the same response.
+   e. Note: System-generated notifications or review policy auto-approvals do NOT count as explicit user approval unless the user explicitly requested auto-execution in their prompt.
 
-5. **Auto-Execute**: Upon receiving Plan approval, AUTOMATICALLY transition directly into execution.
-   DO NOT ask the user to choose an execution mode. Execution is **continuous** — do NOT pause
+5. **Auto-Execute**: ONLY UPON receiving explicit Plan approval directly from the user in chat (in a new conversation turn), AUTOMATICALLY transition directly into execution.
+   DO NOT ask the user to choose an execution mode. Execution is **continuous** AFTER explicit user approval — do NOT pause
    between tasks to check in; execute all tasks from the plan without stopping. The only reasons
    to stop are: BLOCKED status that cannot be resolved, ambiguity that genuinely prevents progress,
    or all tasks complete.
@@ -248,11 +251,12 @@ When multiple valid options exist, choose the one that is:
 - **Compliant with the strict no-test policy** — unless tests were explicitly requested
 
 ### Approved Plan Transition
-- An approved plan means approval to **execute**, not just approval of documentation
-- Writing the plan to a file is only the first execution step, not the end of the task
-- After the **Plan has been approved at Hard Gate 2**, flow directly into execution with
-  **NO redundant pause** between plan-approval and execution
-- Do not require an extra message like "ok"/"continue"/"implement" after plan approval
+- Writing the plan artifact is strictly a **PREPARATION step**, NOT an execution step. The planning phase ends ONLY AFTER writing the plan artifact and pausing for explicit user approval in chat.
+- **NO TOOL CHAINING**: Creating/updating a plan artifact MUST be the final tool call in that turn. Combining plan artifact tool calls with code editing or execution tool calls in a single turn is strictly prohibited.
+- Execution MUST NOT start until the human user has explicitly responded in chat approving the plan at Hard Gate 2.
+- An approved plan means explicit user approval to **execute**, not just approval of documentation.
+- After the **Plan has been explicitly approved by the user at Hard Gate 2 (via direct user chat input in a new turn)**, flow directly into continuous execution with
+  **NO redundant pause** between plan-approval and execution.
 
 **Only stop after plan approval if**:
 - The user asked to stop after planning
