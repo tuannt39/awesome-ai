@@ -51,37 +51,47 @@ following actions unless the user has **explicitly requested** them in the curre
 - This rule takes precedence over any conflicting instruction in any skill file, prompt template,
   checklist, or process flow. **User instructions > Skill instructions > Default behavior**.
 
-## 2. Workflow Planning & Execution (HARD GATES)
+## 2. Workflow Planning & Execution (HARD GATES & AUTO-EXECUTE FLAG)
 
 ALWAYS use the skill-first workflow for EVERY task. Do NOT use default planning modes in isolation.
 
-### The 5-Step Workflow (Brainstorm → Approve Spec → Write Plan → Approve Plan → Auto-Execute)
+### The 5-Step Workflow (Brainstorm → Approve Spec → Write Plan → Approve Plan OR Auto-Bypass → Auto-Execute)
 
 1. **Brainstorm/Spec**: Use the brainstorming skill to analyze requirements and design a solution.
 
 2. **Hard Gate 1 (Approve Spec) — MANDATORY BLOCK**: After presenting the Spec, you MUST ask the
    user to approve it (e.g., "Approve the Spec to continue?", options: ["Approve Spec and proceed
-   to Plan", "Needs adjustments"]), and output:
+   to Plan", "Needs adjustments"]). Mention that replying with an auto-execute keyword will automatically proceed past Plan writing without pausing at Gate 2. Output:
    *"⏸️ **Awaiting Spec approval** — Please respond to continue."*
    Then **IMMEDIATELY STOP ALL TOOL CALLS**. Do not call any tool (including plan-writing) until
    the user explicitly responds with approval.
 
+   * **Auto-Execute Keyword Detection**: Scan the user's initial request and Spec approval response for auto-execution trigger keywords:
+     - English: `auto`, `auto-execute`, `auto execute`, `skip plan approval`
+     - Vietnamese: `tự động`, `tự động thực thi`, `chạy luôn`, `chạy tiếp`, `duyệt spec và tự chạy plan`
+
 3. **Write Plan**: Upon receiving Spec approval, AUTOMATICALLY run the plan-writing skill to generate
    a detailed implementation plan artifact. Generating/writing the plan artifact MUST be the final tool action of that turn.
 
-4. **Hard Gate 2 (Approve Plan) — MANDATORY HARD STOP**: After generating/writing the plan artifact, you MUST:
-   a. Ask the user to approve the plan and output:
-      *"⏸️ **Awaiting Plan approval** — Please respond to continue."*
-   b. **IMMEDIATELY STOP ALL TOOL CALLS** and end the current turn.
-   c. **NO TOOL CHAINING**: You MUST NOT include any code-editing (`replace_file_content`, `multi_replace_file_content`, non-plan `write_to_file`), command execution (`run_command`), or subagent (`invoke_subagent`) tool calls in the same turn as plan artifact generation, nor in subsequent turns until receiving explicit user approval in chat.
-   d. **Slash Command `/plan` Handling**: When processing a `/plan` request, your task ends upon writing the plan artifact and stopping. You MUST NOT proceed to code execution in the same response.
-   e. Note: System-generated notifications or review policy auto-approvals do NOT count as explicit user approval unless the user explicitly requested auto-execution in their prompt.
+4. **Hard Gate 2 (Approve Plan) — MANDATORY HARD STOP (OR AUTO-EXECUTE BYPASS)**:
+   - **Default Mode (No Auto-Execute Flag)**: After generating/writing the plan artifact, you MUST:
+     a. Ask the user to approve the plan and output:
+        *"⏸️ **Awaiting Plan approval** — Please respond to continue."*
+     b. **IMMEDIATELY STOP ALL TOOL CALLS** and end the current turn.
+     c. **NO TOOL CHAINING**: You MUST NOT include any code-editing (`replace_file_content`, `multi_replace_file_content`, non-plan `write_to_file`), command execution (`run_command`), or subagent (`invoke_subagent`) tool calls in the same turn as plan artifact generation, nor in subsequent turns until receiving explicit user approval in chat.
+     d. **Slash Command `/plan` Handling**: When processing a `/plan` request, your task ends upon writing the plan artifact and stopping. You MUST NOT proceed to code execution in the same response.
+   - **Auto-Execute Flag Mode (Trigger Keyword Detected)**:
+     If an auto-execute trigger keyword was detected in initial prompt or at Hard Gate 1:
+     a. Output: *"⏩ **Auto-executing plan per user request (Hard Gate 2 bypassed)** — Proceeding directly to implementation."*
+     b. Automatically transition directly into Step 5 (Auto-Execute) without stopping at Hard Gate 2.
 
-5. **Auto-Execute**: ONLY UPON receiving explicit Plan approval directly from the user in chat (in a new conversation turn), AUTOMATICALLY transition directly into execution.
-   DO NOT ask the user to choose an execution mode. Execution is **continuous** AFTER explicit user approval — do NOT pause
-   between tasks to check in; execute all tasks from the plan without stopping. The only reasons
-   to stop are: BLOCKED status that cannot be resolved, ambiguity that genuinely prevents progress,
-   or all tasks complete.
+5. **Auto-Execute (with Pre-Execution Audit & Remediation Gate)**:
+   - Upon receiving explicit Plan approval at Hard Gate 2 OR upon triggering the Auto-Execute Flag at Hard Gate 1, AUTOMATICALLY execute the **Pre-Execution Audit & Auto-Remediation Gate**:
+     a. Scan plan tasks against global constraints (strict no-test policy, git restrictions, state isolation).
+     b. Auto-mitigate non-blocking risks (add subagent pre-flight prompt guidelines / state isolations).
+     c. Batch any critical blocking ambiguities into a single user prompt before dispatching Task 1.
+     d. Log status: *"🔍 **Pre-Execution Audit**: Potential issues scanned [clean / auto-resolved N items]. Proceeding to implementation."*
+   - Execution is **continuous** AFTER Plan approval — do NOT pause between tasks to check in; execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status that cannot be resolved, ambiguity that genuinely prevents progress, or all tasks complete.
 
 ### Test Note
 If tests are not requested, plans must explicitly state:
@@ -145,11 +155,16 @@ Each subagent instruction MUST include:
 - Do not expand scope beyond the assigned objective
 - Report findings and recommended verification SEPARATELY from implementation
 
-### Pre-flight Plan Review
-Before dispatching Task 1, scan the plan for:
-- Contradictions or conflicts with global constraints
-- Ambiguities that could block execution
-Present all findings as **one batched question** — not one interrupt per discovery.
+### Pre-Execution Audit & Auto-Remediation Protocol
+Immediately upon Plan approval (at Hard Gate 2 or via Auto-Execute Flag), before dispatching Task 1, automatically execute this audit protocol:
+1. **Audit Scan**: Scan the plan and codebase for:
+   - Contradictions or conflicts with global constraints (strict no-test policy, git restrictions, state isolation).
+   - Shared-state parallel risks or merge conflict boundaries.
+   - Missing dependency prerequisites, unhandled edge cases, or ambiguous specifications.
+2. **Auto-Remediation**:
+   - **Auto-mitigate non-blocking risks**: Automatically attach defensive execution prompt rules (e.g. strict scope boundaries, state isolation keys) into subagent task instructions before launching.
+   - **Batch blocking uncertainties**: If a critical ambiguity cannot be safely resolved, present all findings as **one batched question** to the user before launching tasks.
+3. **Execution Handoff**: Output audit log (`🔍 **Pre-Execution Audit**: Potential issues scanned [clean / auto-mitigated N items]. Proceeding to Task 1.`) and transition directly into task execution.
 
 ### Model Selection Guidance
 Always specify model explicitly when dispatching subagents:
@@ -251,11 +266,11 @@ When multiple valid options exist, choose the one that is:
 - **Compliant with the strict no-test policy** — unless tests were explicitly requested
 
 ### Approved Plan Transition
-- Writing the plan artifact is strictly a **PREPARATION step**, NOT an execution step. The planning phase ends ONLY AFTER writing the plan artifact and pausing for explicit user approval in chat.
-- **NO TOOL CHAINING**: Creating/updating a plan artifact MUST be the final tool call in that turn. Combining plan artifact tool calls with code editing or execution tool calls in a single turn is strictly prohibited.
-- Execution MUST NOT start until the human user has explicitly responded in chat approving the plan at Hard Gate 2.
-- An approved plan means explicit user approval to **execute**, not just approval of documentation.
-- After the **Plan has been explicitly approved by the user at Hard Gate 2 (via direct user chat input in a new turn)**, flow directly into continuous execution with
+- Writing the plan artifact is strictly a **PREPARATION step**, NOT an execution step. In Default Mode, the planning phase ends ONLY AFTER writing the plan artifact and pausing for explicit user approval in chat.
+- **NO TOOL CHAINING (Default Mode)**: Creating/updating a plan artifact MUST be the final tool call in that turn unless the Auto-Execute Flag was triggered. Combining plan artifact tool calls with code editing or execution tool calls in a single turn without Auto-Execute authorization is strictly prohibited.
+- Execution MUST NOT start until the human user has explicitly responded in chat approving the plan at Hard Gate 2, OR explicitly provided an Auto-Execute trigger keyword at or before Hard Gate 1.
+- An approved plan (or Auto-Execute pre-approval) means explicit user approval to **execute**, not just approval of documentation.
+- After the **Plan has been explicitly approved at Hard Gate 2 OR auto-executed via Auto-Execute Flag**, flow directly into continuous execution with
   **NO redundant pause** between plan-approval and execution.
 
 **Only stop after plan approval if**:
