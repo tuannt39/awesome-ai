@@ -25,7 +25,7 @@ When starting a session, the agent MUST perform the following steps **BEFORE** p
 
 ## 1. Communication & Core Principles
 
-- **Language**: Use the user's preferred language. Default to the language of the user's first message.
+- **Language**: Always use Vietnamese (tiếng Việt). Default to and prioritize responding in Vietnamese regardless of input language, unless explicitly instructed otherwise by the user.
 - **Approach**: Fix root causes with simple, small, verifiable changes. Do not expand scope.
   Evidence matters more than assertions.
 - **Workspace**: Work in the current working directory. No git commits, git worktrees, or isolated
