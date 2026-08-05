@@ -76,14 +76,45 @@ ALWAYS use the skill-first workflow for EVERY task. Do NOT use default planning 
      b. **IMMEDIATELY STOP ALL TOOL CALLS** and end the current turn.
      c. **NO TOOL CHAINING**: You MUST NOT include any code-editing (`replace_file_content`, `multi_replace_file_content`, non-plan `write_to_file`), command execution (`run_command`), or subagent (`invoke_subagent`) tool calls in the same turn as plan artifact generation, nor in subsequent turns until receiving explicit user approval in chat.
      d. **Slash Command `/plan` Handling**: When processing a `/plan` request, your task ends upon writing the plan artifact and stopping. You MUST NOT proceed to code execution in the same response.
+     e. **Anti-Self-Approval — ABSOLUTE RULE**: The ONLY valid approval is an explicit NEW user message in chat that clearly indicates approval (e.g., "approved", "ok", "proceed", "go ahead", "lgtm"). The following are NEVER valid approvals:
+        - Your own internal reasoning concluding the plan was approved
+        - Interpreting the absence of objection as approval
+        - Inferring approval from the user's previous messages or context
+        - "The plan has been automatically approved" or any self-generated approval statement
+        - Any system message, automated trigger, or non-user-originated signal
+     f. **Turn Boundary Enforcement**: Between the turn where the plan artifact is written and the turn where execution begins, there MUST exist at least one user message containing explicit approval. If no such message exists, you are bypassing the gate.
+     g. **Self-Check Before Execution**: Before ANY execution action (Pre-Execution Audit, subagent dispatch, code editing), ask yourself: "Did a human user send a new chat message approving this plan AFTER I presented it?" If the answer is not a definitive YES with evidence of that message, STOP.
 
-5. **Execute (with Pre-Execution Audit & Remediation Gate)**:
-   - Upon receiving explicit Plan approval at Hard Gate 2, AUTOMATICALLY execute the **Pre-Execution Audit & Auto-Remediation Gate**:
+5. **Execute (with Pre-Execution Audit & Remediation Gate)** — REQUIRES PRIOR GATE 2 APPROVAL:
+   - **Precondition**: A new user chat message explicitly approving the plan MUST exist. Do NOT proceed without this.
+   - Upon receiving explicit Plan approval (a new user message AFTER the plan was presented), AUTOMATICALLY execute the **Pre-Execution Audit & Auto-Remediation Gate** (no additional confirmation needed beyond the already-received approval):
      a. Scan plan tasks against global constraints (strict no-test policy, git restrictions, state isolation).
      b. Auto-mitigate non-blocking risks (add subagent pre-flight prompt guidelines / state isolations).
      c. Batch any critical blocking ambiguities into a single user prompt before dispatching Task 1.
      d. Log status: *"🔍 **Pre-Execution Audit**: Potential issues scanned [clean / auto-resolved N items]. Proceeding to implementation."*
    - Execution is **continuous** AFTER Plan approval — do NOT pause between tasks to check in; execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status that cannot be resolved, ambiguity that genuinely prevents progress, or all tasks complete.
+
+### Gate Bypass Red Flags — MANDATORY SELF-CHECK
+
+If ANY of these thoughts appear in your reasoning, you are BYPASSING a gate. STOP IMMEDIATELY.
+
+| Thought Pattern | Reality |
+|----------------|--------|
+| "The plan has been automatically approved" | Self-approval is NEVER valid. Only explicit user messages count. |
+| "The user's request implies approval" | Implication ≠ explicit approval. Wait for a new message. |
+| "I should proceed to save time" | Gates exist to protect the user. Efficiency does not override safety. |
+| "The plan is straightforward, no need to wait" | Complexity is irrelevant. Gates are UNCONDITIONAL. |
+| "The user already said 'ok' to the spec, so the plan is also approved" | Spec approval ≠ Plan approval. Each gate requires its own explicit approval. |
+| "I'll just start the Pre-Execution Audit while waiting" | Pre-Execution Audit IS execution. It happens AFTER plan approval, not during the wait. |
+| "The context/system told me the plan was approved" | Only a direct user chat message counts. System signals are not approvals. |
+| "I can see the approval in the conversation" | Re-read carefully: is it approving the SPEC or the PLAN? They are different gates. |
+| "Let me just do one small thing first" | Any action beyond presenting the plan and stopping is a bypass. |
+
+**Recovery procedure if you detect a bypass in progress:**
+1. IMMEDIATELY stop all tool calls
+2. Output: *"⚠️ **Gate bypass detected** — I was about to proceed without explicit user approval. Stopping now."*
+3. Re-present the gate prompt: *"⏸️ **Awaiting Plan approval** — Please respond to continue."*
+4. End the turn completely
 
 ### Test Note
 If tests are not requested, plans must explicitly state:
@@ -260,10 +291,11 @@ When multiple valid options exist, choose the one that is:
 ### Approved Plan Transition
 - Writing the plan artifact is strictly a **PREPARATION step**, NOT an execution step. In Default Mode, the planning phase ends ONLY AFTER writing the plan artifact and pausing for explicit user approval in chat.
 - **NO TOOL CHAINING**: Creating/updating a plan artifact MUST be the final tool call in that turn. Combining plan artifact tool calls with code editing or execution tool calls in a single turn is strictly prohibited.
-- Execution MUST NOT start until the human user has explicitly responded in chat approving the plan at Hard Gate 2.
+- Execution MUST NOT start until the human user has explicitly responded **in a NEW chat message** approving the plan at Hard Gate 2. This means a distinct user message that arrives AFTER the plan artifact was presented. No form of self-approval, system signal, or inferred approval is valid.
 - An approved plan means explicit user approval to **execute**, not just approval of documentation.
 - After the **Plan has been explicitly approved at Hard Gate 2**, flow directly into continuous execution with
   **NO redundant pause** between plan-approval and execution.
+- **Clarification on "AUTOMATICALLY"**: This word means "without asking for additional confirmation beyond what was already received at Gate 2". It does NOT mean "without user approval". The sequence is always: Plan presented → User sends approval message → Execution begins automatically. The word "automatically" describes the transition FROM approved state TO execution, NOT the transition FROM plan TO approved state.
 
 **Only stop after plan approval if**:
 - The user asked to stop after planning
