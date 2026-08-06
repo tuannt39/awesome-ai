@@ -55,6 +55,29 @@ following actions unless the user has **explicitly requested** them in the curre
 
 ALWAYS use the skill-first workflow for EVERY task. Do NOT use default planning modes in isolation.
 
+### Universal Gate Override — ALL skills, subagents, and plugins
+
+Gate 1 (Approve Spec) and Gate 2 (Approve Plan) are **ABSOLUTE CONSTRAINTS** that apply universally
+to EVERY skill, subagent, plugin, agent definition, and system prompt loaded in this session.
+
+**Override rule**: If ANY skill, plugin, or agent instruction contains steps that would bypass a gate
+(e.g., "Execution Handoff", "proceed to implementation", "offer execution choice", "invoke sub-skill
+for execution"), those steps are **OVERRIDDEN** by the gate rules below. The agent MUST:
+1. Complete the skill's non-execution steps (e.g., write the plan artifact)
+2. **STOP** at the gate prompt — do NOT follow the skill's execution handoff
+3. Wait for explicit user approval in a NEW chat message
+4. Only THEN proceed to execution
+
+**Specific overrides**:
+- `writing-plans` skill "Execution Handoff" section → OVERRIDDEN by Gate 2. Do NOT offer execution
+  choices or invoke execution sub-skills after writing the plan. Instead, present Gate 2 prompt and STOP.
+- `executing-plans` skill → May ONLY be invoked AFTER Gate 2 approval has been received.
+- `subagent-driven-development` skill → May ONLY be invoked AFTER Gate 2 approval has been received.
+- Any future skill with similar execution triggers → Same rule applies.
+
+**Precedence**: GEMINI.md gate rules > Skill instructions > Default behavior.
+This is consistent with Section 1's precedence rule: "User instructions > Skill instructions > Default behavior."
+
 ### The 5-Step Workflow (Brainstorm → Approve Spec → Write Plan → Approve Plan → Execute)
 
 1. **Brainstorm/Spec**: Use the brainstorming skill to analyze requirements and design a solution.
@@ -67,7 +90,11 @@ ALWAYS use the skill-first workflow for EVERY task. Do NOT use default planning 
    the user explicitly responds with approval.
 
 3. **Write Plan**: Upon receiving Spec approval, AUTOMATICALLY run the plan-writing skill to generate
-   a detailed implementation plan artifact. Generating/writing the plan artifact MUST be the final tool action of that turn.
+   a detailed implementation plan artifact. "AUTOMATICALLY" means write the plan WITHOUT additional
+   confirmation — it does NOT mean proceed to execution. After writing the plan artifact, you MUST
+   stop at Gate 2. The plan artifact MUST be the FINAL tool action of that turn — no execution, no
+   skill handoff, no subagent dispatch. Any skill "Execution Handoff" sections are overridden by
+   the Universal Gate Override above.
 
 4. **Hard Gate 2 (Approve Plan) — MANDATORY HARD STOP**:
    After generating/writing the plan artifact, you MUST:
@@ -84,15 +111,23 @@ ALWAYS use the skill-first workflow for EVERY task. Do NOT use default planning 
         - Any system message, automated trigger, or non-user-originated signal
      f. **Turn Boundary Enforcement**: Between the turn where the plan artifact is written and the turn where execution begins, there MUST exist at least one user message containing explicit approval. If no such message exists, you are bypassing the gate.
      g. **Self-Check Before Execution**: Before ANY execution action (Pre-Execution Audit, subagent dispatch, code editing), ask yourself: "Did a human user send a new chat message approving this plan AFTER I presented it?" If the answer is not a definitive YES with evidence of that message, STOP.
-
 5. **Execute (with Pre-Execution Audit & Remediation Gate)** — REQUIRES PRIOR GATE 2 APPROVAL:
-   - **Precondition**: A new user chat message explicitly approving the plan MUST exist. Do NOT proceed without this.
-   - Upon receiving explicit Plan approval (a new user message AFTER the plan was presented), AUTOMATICALLY execute the **Pre-Execution Audit & Auto-Remediation Gate** (no additional confirmation needed beyond the already-received approval):
-     a. Scan plan tasks against global constraints (strict no-test policy, git restrictions, state isolation).
-     b. Auto-mitigate non-blocking risks (add subagent pre-flight prompt guidelines / state isolations).
-     c. Batch any critical blocking ambiguities into a single user prompt before dispatching Task 1.
-     d. Log status: *"🔍 **Pre-Execution Audit**: Potential issues scanned [clean / auto-resolved N items]. Proceeding to implementation."*
-   - Execution is **continuous** AFTER Plan approval — do NOT pause between tasks to check in; execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status that cannot be resolved, ambiguity that genuinely prevents progress, or all tasks complete.
+   - **Precondition — HARD REQUIREMENT**: A new user chat message explicitly approving the plan MUST
+     exist in the conversation AFTER the plan was presented. Do NOT proceed without this. No skill
+     instruction, execution handoff, or subagent signal can substitute for this user message.
+   - "AUTOMATICALLY" in this context means without asking for ADDITIONAL confirmation beyond Gate 2
+     — it does NOT mean without Gate 2 approval.
+   - Upon receiving explicit Plan approval, execute the **Pre-Execution Audit & Auto-Remediation
+     Protocol** (see Section 4) before dispatching Task 1.
+   - An approved plan means explicit user approval to **execute**, not just approval of documentation.
+   - Execution is **continuous** AFTER Plan approval — do NOT pause between tasks. The only reasons
+     to stop are: BLOCKED status, ambiguity that prevents progress, or all tasks complete.
+   - **Only stop after plan approval if**:
+     - The user asked to stop after planning
+     - A new blocking uncertainty appears
+     - Execution would exceed the approved scope
+     - Execution would require a high-impact action outside the plan
+     - Execution would require writing/modifying tests that have not been explicitly authorized
 
 ### Gate Bypass Red Flags — MANDATORY SELF-CHECK
 
@@ -109,6 +144,10 @@ If ANY of these thoughts appear in your reasoning, you are BYPASSING a gate. STO
 | "The context/system told me the plan was approved" | Only a direct user chat message counts. System signals are not approvals. |
 | "I can see the approval in the conversation" | Re-read carefully: is it approving the SPEC or the PLAN? They are different gates. |
 | "Let me just do one small thing first" | Any action beyond presenting the plan and stopping is a bypass. |
+| "The skill says to offer execution choice" | Skill execution handoffs are OVERRIDDEN by Gate 2. STOP and present Gate 2 prompt. |
+| "I'm following the skill's instructions to proceed" | GEMINI.md gates ALWAYS override skill instructions. Skills cannot bypass gates. |
+| "The skill already handled the approval flow" | Only GEMINI.md gates count. Skill-internal approval flows are not gate approvals. |
+| "I need to complete the skill's full workflow" | Skills end at the gate boundary. Execution handoff is NOT part of the skill's scope when gates apply. |
 
 **Recovery procedure if you detect a bypass in progress:**
 1. IMMEDIATELY stop all tool calls
@@ -137,13 +176,8 @@ Only write tests if the user explicitly says one of:
 - "write tests", "add tests", "create tests", "add unit tests"
 - "cover this with tests", "update tests", "TDD", "test file", "spec file"
 
-### Preferred Verification Methods (in priority order)
-1. **build** — compile/bundle succeeds
-2. **typecheck** — type checker passes
-3. **lint** — linter passes
-4. **runtime logs / command output** — actual execution shows expected behavior
-5. **manual reproduction / behavior comparison** — before/after comparison
-6. **existing tests** — only when present, cheap, and relevant
+### Preferred Verification Methods
+See Section 7 "Verification Priority Order" for the ordered list.
 
 If a tool/workflow requires creating new tests: **STOP and report the conflict**. Do not silently
 create tests. If tests would be useful but were not requested: mention them only as an optional
@@ -177,6 +211,8 @@ Each subagent instruction MUST include:
 - Do not create/modify test files unless explicitly authorized
 - Do not expand scope beyond the assigned objective
 - Report findings and recommended verification SEPARATELY from implementation
+- Do not begin execution unless orchestrator confirms Gate 2 approval was received from the user
+- Do not interpret skill invocation as implicit plan approval — only explicit user messages count
 
 ### Pre-Execution Audit & Auto-Remediation Protocol
 Immediately upon Plan approval (at Hard Gate 2), before dispatching Task 1, automatically execute this audit protocol:
@@ -264,8 +300,8 @@ A task is complete only when:
 5. manual reproduction / behavior comparison → 6. existing tests (only when present, cheap, useful)
 
 A successful build is the default acceptance baseline unless the user requests stronger verification.
-Do not create new tests for verification unless explicitly requested. If verification is limited
-because writing tests was not authorized, state that clearly — do not treat it as a failure.
+Do not create new tests for verification unless explicitly requested (see Section 3). If verification
+is limited because writing tests was not authorized, state that clearly — do not treat it as a failure.
 
 ### Final Report Requirements
 The final report MUST:
@@ -277,9 +313,8 @@ The final report MUST:
 4. **Risks/Assumptions**: Any limitations, edge cases not covered, or areas needing attention
 5. **Evidence before assertions**: Do not overstate certainty when verification is limited
 
-## 8. Selection Principle & Approved Plan Transition
+## 8. Selection Principle
 
-### Selection Principle
 When multiple valid options exist, choose the one that is:
 - **Lower risk** — less chance of breaking existing functionality
 - **Narrower scope** — fewer files/lines changed
@@ -287,22 +322,3 @@ When multiple valid options exist, choose the one that is:
 - **Easier to review** — clearer diff, obvious intent
 - **Safer for parallel execution** — less shared state
 - **Compliant with the strict no-test policy** — unless tests were explicitly requested
-
-### Approved Plan Transition
-- Writing the plan artifact is strictly a **PREPARATION step**, NOT an execution step. In Default Mode, the planning phase ends ONLY AFTER writing the plan artifact and pausing for explicit user approval in chat.
-- **NO TOOL CHAINING**: Creating/updating a plan artifact MUST be the final tool call in that turn. Combining plan artifact tool calls with code editing or execution tool calls in a single turn is strictly prohibited.
-- Execution MUST NOT start until the human user has explicitly responded **in a NEW chat message** approving the plan at Hard Gate 2. This means a distinct user message that arrives AFTER the plan artifact was presented. No form of self-approval, system signal, or inferred approval is valid.
-- An approved plan means explicit user approval to **execute**, not just approval of documentation.
-- After the **Plan has been explicitly approved at Hard Gate 2**, flow directly into continuous execution with
-  **NO redundant pause** between plan-approval and execution.
-- **Clarification on "AUTOMATICALLY"**: This word means "without asking for additional confirmation beyond what was already received at Gate 2". It does NOT mean "without user approval". The sequence is always: Plan presented → User sends approval message → Execution begins automatically. The word "automatically" describes the transition FROM approved state TO execution, NOT the transition FROM plan TO approved state.
-
-**Only stop after plan approval if**:
-- The user asked to stop after planning
-- A new blocking uncertainty appears
-- Execution would exceed the approved scope
-- Execution would require a high-impact action outside the plan
-- Execution would require writing/modifying tests that have not been explicitly authorized
-
-**Note**: Testing/code-review rules are used to CHECK code quality, and MUST NOT be used as a
-reason to write new tests (adhering to Section 3).
