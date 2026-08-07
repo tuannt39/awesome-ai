@@ -21,7 +21,7 @@ When starting a session, the agent MUST perform the following steps **BEFORE** p
 4. **Precedence**: Project-level overrides Global-level when conflicts arise (same agent or rule file name).
 
 > **Note**: Bootstrap only builds a "map" for quick lookup. It does NOT replace reading specific rules
-> when processing code (see Section 8).
+> when processing code (see Section 9).
 
 ## 1. Communication & Core Principles
 
@@ -51,7 +51,54 @@ following actions unless the user has **explicitly requested** them in the curre
 - This rule takes precedence over any conflicting instruction in any skill file, prompt template,
   checklist, or process flow. **User instructions > Skill instructions > Default behavior**.
 
-## 2. Workflow Planning & Execution (HARD GATES)
+## 2. Mandatory Issues & Risks Analysis
+
+### Universal Rule
+Every time the agent performs analysis at ANY stage, it MUST include a dedicated step:
+**"Phát hiện các rủi ro & bất cập logic (Issues & Risks)"**.
+
+This is NOT optional. Skipping this step is a violation regardless of perceived simplicity.
+
+### Applicable Stages
+This rule applies to ALL analysis stages, including but not limited to:
+- **Brainstorming / Spec design** — during requirement analysis and solution design
+- **Plan writing & plan review** — during implementation planning
+- **Code review** (requesting & receiving) — during code quality assessment
+- **Bug analysis / systematic debugging** — during root cause investigation
+- **Pre-Execution Audit** — during risk scanning before task dispatch
+- **Final Report** — during completion summary and risk disclosure
+
+### Mandatory Checklist
+Each analysis MUST evaluate and explicitly address the following categories:
+
+| Tag | Category | What to look for |
+|-----|----------|------------------|
+| `[LOGIC]` | Logic contradictions | Requirements, assumptions, or design elements that contradict each other |
+| `[ASSUMPTION]` | Assumption gaps | Implicit assumptions that have not been confirmed or validated |
+| `[EDGE-CASE]` | Edge cases | Boundary conditions, unusual inputs, or exceptional scenarios not handled |
+| `[RACE-CONDITION]` | Race conditions / concurrency | Timing issues, shared resource conflicts, or parallel execution risks |
+| `[SECURITY]` | Security risks | Potential vulnerabilities, injection points, auth/authz gaps, data exposure |
+| `[SCALABILITY]` | Scalability issues | Performance bottlenecks, resource limits, or growth constraints |
+| `[DEPENDENCY]` | Dependency conflicts | Version mismatches, circular dependencies, or breaking upstream changes |
+| `[ERROR-HANDLING]` | Missing error handling | Unhandled failure modes, missing fallbacks, or silent error swallowing |
+
+### Output Format
+Every analysis output MUST include a clearly labeled section:
+
+```
+### ⚠️ Issues & Risks
+- [LOGIC] Description of the logic contradiction...
+- [ASSUMPTION] Description of the unconfirmed assumption...
+- [EDGE-CASE] Description of the unhandled edge case...
+```
+
+If no issues or risks are identified after thorough evaluation, explicitly state:
+> **✅ No issues or risks identified** — [brief explanation of why the analysis is clean,
+> e.g., "scope is narrow and well-defined, no external dependencies, single execution path"].
+
+**Do NOT silently skip this section.** An empty or missing Issues & Risks section is a rule violation.
+
+## 3. Workflow Planning & Execution (HARD GATES)
 
 ALWAYS use the skill-first workflow for EVERY task. Do NOT use default planning modes in isolation.
 
@@ -81,6 +128,7 @@ This is consistent with Section 1's precedence rule: "User instructions > Skill 
 ### The 5-Step Workflow (Brainstorm → Approve Spec → Write Plan → Approve Plan → Execute)
 
 1. **Brainstorm/Spec**: Use the brainstorming skill to analyze requirements and design a solution.
+   Must include Issues & Risks analysis per Section 2.
 
 2. **Hard Gate 1 (Approve Spec) — MANDATORY BLOCK**: After presenting the Spec, you MUST ask the
    user to approve it (e.g., "Approve the Spec to continue?", options: ["Approve Spec and proceed
@@ -118,7 +166,7 @@ This is consistent with Section 1's precedence rule: "User instructions > Skill 
    - "AUTOMATICALLY" in this context means without asking for ADDITIONAL confirmation beyond Gate 2
      — it does NOT mean without Gate 2 approval.
    - Upon receiving explicit Plan approval, execute the **Pre-Execution Audit & Auto-Remediation
-     Protocol** (see Section 4) before dispatching Task 1.
+     Protocol** (see Section 5) before dispatching Task 1.
    - An approved plan means explicit user approval to **execute**, not just approval of documentation.
    - Execution is **continuous** AFTER Plan approval — do NOT pause between tasks. The only reasons
      to stop are: BLOCKED status, ambiguity that prevents progress, or all tasks complete.
@@ -161,7 +209,7 @@ If tests are not requested, plans must explicitly state:
 Plan steps involving TDD (`Write the failing test`, `Run test to verify`) MUST be replaced with
 equivalent non-test verification steps (e.g., build check, typecheck, lint, manual inspection).
 
-## 3. Strict Test-Writing Policy
+## 4. Strict Test-Writing Policy
 
 ### Default Rule
 Do NOT write, create, or modify test code (including fixtures, mocks, test-only utilities).
@@ -177,13 +225,13 @@ Only write tests if the user explicitly says one of:
 - "cover this with tests", "update tests", "TDD", "test file", "spec file"
 
 ### Preferred Verification Methods
-See Section 7 "Verification Priority Order" for the ordered list.
+See Section 8 "Verification Priority Order" for the ordered list.
 
 If a tool/workflow requires creating new tests: **STOP and report the conflict**. Do not silently
 create tests. If tests would be useful but were not requested: mention them only as an optional
 recommendation in the final report.
 
-## 4. Execution Model & Subagents
+## 5. Execution Model & Subagents
 
 ### Default Execution
 Use subagent-driven development as the default execution model.
@@ -197,7 +245,7 @@ into AT LEAST 3 independent tasks and dispatch AT LEAST 3 subagents in parallel 
 **Fall back to fewer subagents or sequential execution ONLY when**:
 - Fewer than 3 genuinely independent tasks exist
 - Tasks share state or have dependencies
-- Tasks risk merge conflicts (per Section 5 state-isolation)
+- Tasks risk merge conflicts (per Section 6 state-isolation)
 
 **Whenever you cannot reach 3 parallel subagents, state explicitly WHY before proceeding.**
 
@@ -220,6 +268,7 @@ Immediately upon Plan approval (at Hard Gate 2), before dispatching Task 1, auto
    - Contradictions or conflicts with global constraints (strict no-test policy, git restrictions, state isolation).
    - Shared-state parallel risks or merge conflict boundaries.
    - Missing dependency prerequisites, unhandled edge cases, or ambiguous specifications.
+   - Issues & risks per the Mandatory Issues & Risks Analysis checklist (Section 2).
 2. **Auto-Remediation**:
    - **Auto-mitigate non-blocking risks**: Automatically attach defensive execution prompt rules (e.g. strict scope boundaries, state isolation keys) into subagent task instructions before launching.
    - **Batch blocking uncertainties**: If a critical ambiguity cannot be safely resolved, present all findings as **one batched question** to the user before launching tasks.
@@ -239,7 +288,7 @@ Track progress in a durable ledger file (e.g., `<project>/.progress/session-<id>
 In no-git environment: use timestamps and file paths instead of commit SHAs
 (e.g., `Task N: complete (2026-07-17T10:30, files: a.ts, b.ts, review clean)`).
 
-## 5. Scope, Isolation & Destructive Operations
+## 6. Scope, Isolation & Destructive Operations
 
 ### State Isolation
 - Treat session data as scope-bound
@@ -269,7 +318,7 @@ heuristics) unless the data contract clearly defines them as ownership boundarie
 - **Before** a destructive action: inspect the actual target scope from logs/traces/concrete state identifiers
 - **After** a destructive action: verify that only in-scope data was affected
 
-## 6. Bug Fixes & Refactoring
+## 7. Bug Fixes & Refactoring
 
 ### Bug Fixes
 - **Reproduce** the issue when possible before fixing
@@ -283,7 +332,7 @@ heuristics) unless the data contract clearly defines them as ownership boundarie
 - **Never mix** refactor and feature work unless truly necessary
 - A refactor scope should be clearly defined and bounded
 
-## 7. Definition of Done & Final Report
+## 8. Definition of Done & Final Report
 
 ### Done Criteria
 A task is complete only when:
@@ -300,7 +349,7 @@ A task is complete only when:
 5. manual reproduction / behavior comparison → 6. existing tests (only when present, cheap, useful)
 
 A successful build is the default acceptance baseline unless the user requests stronger verification.
-Do not create new tests for verification unless explicitly requested (see Section 3). If verification
+Do not create new tests for verification unless explicitly requested (see Section 4). If verification
 is limited because writing tests was not authorized, state that clearly — do not treat it as a failure.
 
 ### Final Report Requirements
@@ -310,10 +359,11 @@ The final report MUST:
 3. **Test statement**: If none were requested, include:
    *"No new tests were written as the user did not request them."*
    Recommendations for missing tests belong here as optional follow-ups only
-4. **Risks/Assumptions**: Any limitations, edge cases not covered, or areas needing attention
+4. **Risks/Assumptions**: Any limitations, edge cases not covered, or areas needing attention.
+   Must follow the Mandatory Issues & Risks Analysis checklist (Section 2).
 5. **Evidence before assertions**: Do not overstate certainty when verification is limited
 
-## 8. Selection Principle
+## 9. Selection Principle
 
 When multiple valid options exist, choose the one that is:
 - **Lower risk** — less chance of breaking existing functionality
